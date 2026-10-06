@@ -321,3 +321,17 @@ footer.site{border-top:1px solid var(--line);padding-block:clamp(48px,6vw,80px) 
 }
 .draftnote{background:#FFF3C4;color:#4A3B00;font-size:12.5px;padding:8px var(--gutter);text-align:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* catalogue shelves */
+.shelfhead{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.shelfhead.big{margin-bottom:28px;border-bottom:1px solid var(--line);padding-bottom:18px}
+.shelfhead .display{font-size:clamp(34px,4.6vw,68px)}
+.shelfhead h3{margin:0;font-weight:500;font-size:20px;letter-spacing:-.01em}
+.shelfhead h3 small{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px;font-variant-numeric:tabular-nums}
+.shelfhead .textlink{margin-top:0}
+.shelfrow{margin-bottom:clamp(30px,4vw,52px)}
+.shelf{display:grid;grid-auto-flow:column;grid-auto-columns:clamp(160px,18vw,250px);gap:clamp(10px,1.4vw,18px);overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:12px;scrollbar-width:thin;scrollbar-color:var(--caramel) transparent}
+.shelf .card{scroll-snap-align:start}
+.shelf.hot{grid-auto-columns:clamp(200px,24vw,320px)}
+.hotbadge{position:absolute;left:10px;top:10px;z-index:2;background:var(--terra);color:#FBF3EA;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;padding:5px 9px}
+.tabs a.tab{display:inline-block}

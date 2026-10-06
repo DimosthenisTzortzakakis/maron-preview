@@ -118,19 +118,16 @@ function catalogue(DB) {
   const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
   if (page === 'catalogue') {
-    const chips = $('#chips'), grid = $('#grid'), cnt = $('#count'), more = $('#more'), q = $('#q');
-    const TOP = ['tourtes', 'glyka', 'pagota', 'menou'];
-    let cur = 'all';
-    chips.innerHTML = `<button class="chip" data-k="all" aria-pressed="true">Όλα <small>${P.length}</small></button>` +
-      TOP.flatMap(k => [k, ...kids(k).map(c => c.key)]).filter(k => cats[k] && inCat(k).length).map(k => `<button class="chip" data-k="${k}" aria-pressed="false" ${TOP.includes(k) ? 'style="font-weight:500"' : ''}>${esc(label(k))} <small>${inCat(k).length}</small></button>`).join('');
-    const run = () => { const term = norm(q.value.trim()); let list = cur === 'all' ? P : inCat(cur);
-      if (term) list = list.filter(p => norm(p.n + ' ' + p.s + ' ' + p.alt).includes(term));
-      listing(list, grid, cnt, more); };
-    chips.onclick = e => { const b = e.target.closest('.chip'); if (!b) return; cur = b.dataset.k; $$('.chip', chips).forEach(x => x.setAttribute('aria-pressed', x === b)); run(); };
+    const grid = $('#grid'), cnt = $('#count'), more = $('#more'), q = $('#q'), res = $('#results'), shelves = $('#shelves');
+    $$('.shelf[data-cat]').forEach(el => { const list = inCat(el.dataset.cat); el.innerHTML = list.slice(0, 12).map(card).join(''); });
+    $$('.shelf[data-ids]').forEach(el => { el.innerHTML = el.dataset.ids.split(',').map(i => byId[+i]).filter(Boolean)
+      .map(p => card(p).replace('<div class="ph">', '<div class="ph"><span class="hotbadge">Hot</span>')).join(''); });
+    const run = () => { const term = norm(q.value.trim());
+      if (!term) { res.hidden = true; shelves.hidden = false; cnt.hidden = true; return; }
+      res.hidden = false; shelves.hidden = true; cnt.hidden = false;
+      listing(P.filter(p => norm(p.n + ' ' + p.s + ' ' + p.alt).includes(term)), grid, cnt, more); };
     let tm; q.oninput = () => { clearTimeout(tm); tm = setTimeout(run, 160); };
     run();
-    // top-level tiles counts
-    $$('[data-count]').forEach(el => el.textContent = inCat(el.dataset.count).length + ' δημιουργίες');
   }
   if (page === 'category') {
     const draw = () => {

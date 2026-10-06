@@ -35,19 +35,30 @@
 <main>
 <div class="wrap"><nav class="crumbs" aria-label="Διαδρομή"><a href="index.html">Αρχική</a> <span aria-hidden="true">/</span> <span>Προϊόντα</span></nav></div>
 <section class="phero wrap"><p class="label">910 δημιουργίες</p><h1 class="display">Προϊόντα</h1>
-<p class="lead">Όλες οι τούρτες, τα γλυκά και τα παγωτά μας σε ένα σημείο. Διαλέξτε κατηγορία ή ψάξτε με λέξη, π.χ. «Paw Patrol», «γάμου», «βανίλια».</p></section>
-<section class="wrap" style="padding-bottom:clamp(40px,5vw,72px)"><div class="cats">
- <a class="cattile" href="katigoria.html#tourtes"><img src="assets/img/c03.webp" alt="" loading="lazy"><span class="t"><b>Τούρτες</b><small data-count="tourtes">662</small></span></a>
- <a class="cattile" href="katigoria.html#glyka"><img src="assets/img/p02.webp" alt="" loading="lazy"><span class="t"><b>Γλυκά</b><small data-count="glyka">210</small></span></a>
- <a class="cattile" href="katigoria.html#pagota"><img src="assets/img/gen/pagota.webp" alt="" loading="lazy"><span class="t"><b>Παγωτά</b><small data-count="pagota">37</small></span></a>
- <a class="cattile" href="epoxika.html"><img src="assets/img/gen/epoxika.webp" alt="" loading="lazy"><span class="t"><b>Εποχικά</b><small>Halloween · Πάσχα · Χριστούγεννα</small></span></a>
-</div></section>
-<section class="wrap" style="padding-bottom:clamp(64px,8vw,120px)" aria-label="Κατάλογος">
-  <div class="tools"><label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.6"/></svg><input id="q" type="search" placeholder="Αναζήτηση στις 910 δημιουργίες" aria-label="Αναζήτηση προϊόντων"></label><span class="count" id="count"></span></div>
-  <div class="chips" id="chips" style="margin-bottom:26px"></div>
-  <div class="grid" id="grid"></div>
-  <div class="more"><button class="darkbtn line" id="more">Περισσότερα</button></div>
+<p class="lead">Τούρτες για κάθε γιορτή, γλυκά από το εργαστήριό μας και χειροποίητο παγωτό.</p></section>
+<div class="tabs"><div class="wrap row">
+  <a class="tab" href="#hot">Hot</a><a class="tab" href="#shelf-tourtes">Τούρτες</a><a class="tab" href="#shelf-glyka">Γλυκά</a><a class="tab" href="#shelf-pagota">Παγωτά</a><a class="tab" href="epoxika.html">Εποχικά</a>
+</div></div>
+<section class="wrap" style="padding-bottom:20px">
+  <div class="tools" style="justify-content:center"><label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.6"/></svg><input id="q" type="search" placeholder="Ψάχνετε κάτι συγκεκριμένο; π.χ. Paw Patrol, γάμου, φράουλα" aria-label="Αναζήτηση προϊόντων"></label><span class="count" id="count" hidden></span></div>
 </section>
+<section class="wrap" id="results" hidden style="padding-bottom:clamp(64px,8vw,120px)"><div class="grid" id="grid"></div><div class="more"><button class="darkbtn line" id="more">Περισσότερα</button></div></section>
+<div id="shelves">
+  <section class="block wrap" id="hot" style="padding-top:clamp(24px,3vw,40px)">
+    <div class="shelfhead"><div><p class="label">Τα πιο αγαπημένα</p><h2 class="display">Hot τώρα</h2></div></div>
+    <div class="shelf hot" data-ids="8937,7859,8802,7694,7505,6916,5572,8933,8825,8827,7653,8846,8763,8119,8683,7445,6894,7706,8812,8803"></div>
+  </section>
+  <section class="block wrap shelfgroup" id="shelf-tourtes" style="padding-top:clamp(24px,3vw,40px)">
+    <div class="shelfhead big"><h2 class="display">Τούρτες</h2><a class="textlink" href="katigoria.html#tourtes">Όλα (662) →</a></div>
+    <div class="shelfrow"><div class="shelfhead"><h3>Παιδικές Τούρτες Γενεθλίων <small>325</small></h3><a class="textlink" href="katigoria.html#paidikes">Δείτε όλες →</a></div><div class="shelf" data-cat="paidikes"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Τούρτες γενεθλίων για μεγάλους <small>304</small></h3><a class="textlink" href="katigoria.html#megaloi">Δείτε όλες →</a></div><div class="shelf" data-cat="megaloi"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Τούρτες με Εκτύπωση <small>150</small></h3><a class="textlink" href="katigoria.html#ektyposi">Δείτε όλες →</a></div><div class="shelf" data-cat="ektyposi"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Τούρτες Baby Shower <small>12</small></h3><a class="textlink" href="katigoria.html#baby-shower">Δείτε όλες →</a></div><div class="shelf" data-cat="baby-shower"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Τούρτες Γάμου <small>4</small></h3><a class="textlink" href="katigoria.html#gamou">Δείτε όλες →</a></div><div class="shelf" data-cat="gamou"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Επετειακές Τούρτες <small>1</small></h3><a class="textlink" href="katigoria.html#epeteiakes">Δείτε όλες →</a></div><div class="shelf" data-cat="epeteiakes"></div></div>
+  </section><section class="block wrap shelfgroup" id="shelf-glyka" style="padding-top:clamp(24px,3vw,40px)">
+    <div class="shelfhead big"><h2 class="display">Γλυκά</h2><a class="textlink" href="katigoria.html#glyka">Όλα (210) →</a></div>
+    <div class="shelfrow"><div class="shelfhead"><h3>Πάστες <small>40</small></h3><a class="textlink" href="katigoria.html#pastes">Δείτε όλες →</a></div><div class="shelf" data-cat="pastes"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Τούρτες (γλυκά) <small>19</small></h3><a class="textlink" href="katigoria.html#glyka-tourtes">Δείτε όλες →</a></div><div class="shelf" data-cat="glyka-tourtes"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Cupcakes <small>20</small></h3><a class="textlink" href="katigoria.html#cupcakes">Δείτε όλες →</a></div><div class="shelf" data-cat="cupcakes"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Μπισκότα <small>46</small></h3><a class="textlink" href="katigoria.html#mpiskota">Δείτε όλες →</a></div><div class="shelf" data-cat="mpiskota"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Κεράσματα <small>40</small></h3><a class="textlink" href="katigoria.html#kerasmata">Δείτε όλες →</a></div><div class="shelf" data-cat="kerasmata"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Σιροπιαστά <small>10</small></h3><a class="textlink" href="katigoria.html#siropiasta">Δείτε όλες →</a></div><div class="shelf" data-cat="siropiasta"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Ταψάκια <small>9</small></h3><a class="textlink" href="katigoria.html#tapsakia">Δείτε όλες →</a></div><div class="shelf" data-cat="tapsakia"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Γάμος – Βάπτιση <small>46</small></h3><a class="textlink" href="katigoria.html#gamos-vaptisi">Δείτε όλες →</a></div><div class="shelf" data-cat="gamos-vaptisi"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Γλυκά με Στέβια <small>6</small></h3><a class="textlink" href="katigoria.html#stevia">Δείτε όλες →</a></div><div class="shelf" data-cat="stevia"></div></div>
+  </section><section class="block wrap shelfgroup" id="shelf-pagota" style="padding-top:clamp(24px,3vw,40px)">
+    <div class="shelfhead big"><h2 class="display">Παγωτά</h2><a class="textlink" href="katigoria.html#pagota">Όλα (37) →</a></div>
+    <div class="shelfrow"><div class="shelfhead"><h3>Τούρτες παγωτό <small>14</small></h3><a class="textlink" href="katigoria.html#pagoto-tourtes">Δείτε όλες →</a></div><div class="shelf" data-cat="pagoto-tourtes"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Παγωτίνια <small>7</small></h3><a class="textlink" href="katigoria.html#pagotinia">Δείτε όλες →</a></div><div class="shelf" data-cat="pagotinia"></div></div><div class="shelfrow"><div class="shelfhead"><h3>Χύμα <small>16</small></h3><a class="textlink" href="katigoria.html#xyma">Δείτε όλες →</a></div><div class="shelf" data-cat="xyma"></div></div>
+  </section>
+</div>
 </main>
 <footer class="site"><div class="wrap">
   <div class="fgrid">
