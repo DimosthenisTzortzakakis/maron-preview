@@ -26,6 +26,7 @@ const REELS = {
   team:     {t:'Η ομάδα μας', ig:null, tt:'7687639170822671618'},
   galatsi:  {t:'Τα Μαρόν παραμένουν ανοιχτά', ig:'Db-SMzZgy56', tt:'7673439278554303766'},
   happy:    {t:'What makes you happy', ig:null, tt:null},
+  blindtaste:{t:'Blind taste challenge', ig:null, tt:'7690927463760710934'},
 };
 const igUrl = r => r.ig ? `https://www.instagram.com/reel/${r.ig}/` : IG;
 const ttUrl = r => r.tt ? `${TT}/video/${r.tt}` : TT;
@@ -83,7 +84,7 @@ if (sig) {
   const render = id => { const c = SIG.find(x => x.id === id) || SIG[0];
     $$('.tab', tabs).forEach(b => b.setAttribute('aria-selected', b.dataset.id === c.id));
     intro.innerHTML = `${esc(c.intro)} <a class="textlink" style="margin:0 0 0 8px" href="${c.href}">Όλα (${c.total}) →</a>`;
-    sig.innerHTML = c.items.map(it => it.v
+    sig.innerHTML = c.items.slice(0, 4).map(it => it.v
       ? `<a class="card" href="${REELS[it.v].ig ? igUrl(REELS[it.v]) : ttUrl(REELS[it.v])}" target="_blank" rel="noopener"><div class="ph"><video src="assets/vid/${it.v}.mp4" poster="assets/vid/${it.v}.jpg" muted loop playsinline preload="none" data-auto aria-hidden="true"></video><span class="badge"><i></i>Video</span></div><div class="cap">${esc(it.n)}<small>Δείτε το βίντεο</small></div></a>`
       : `<a class="card" href="${it.href || c.href}"><div class="ph"><img src="${it.img}" alt="${esc(it.n)}" loading="lazy"></div><div class="cap">${esc(it.n)}</div></a>`).join('');
     watch(sig); };
@@ -94,7 +95,7 @@ if (sig) {
 
 /* ---------- catalogue (products / category / product pages) ---------- */
 const page = document.body.dataset.page;
-if (['catalogue', 'category', 'product'].includes(page)) {
+if (['catalogue', 'category', 'product'].includes(page) || $('#homeHot')) {
   fetch('assets/products.json').then(r => r.json()).then(DB => catalogue(DB)).catch(err => { const m = $('main'); m && m.insertAdjacentHTML('beforeend', `<p class="empty wrap">Δεν φορτώθηκε ο κατάλογος (${esc(err.message)}).</p>`); });
 }
 function catalogue(DB) {
@@ -117,6 +118,13 @@ function catalogue(DB) {
   }
   const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
+  const hh = $('#homeHot');
+  if (hh) {
+    const vid = (k, n, sub) => { const r = REELS[k]; return `<a class="card" href="${r.ig ? igUrl(r) : ttUrl(r)}" target="_blank" rel="noopener"><div class="ph"><span class="hotbadge">Hot</span><video src="assets/vid/${k}.mp4" poster="assets/vid/${k}.jpg" muted loop playsinline preload="none" data-auto aria-hidden="true"></video></div><div class="cap">${esc(n)}<small>${esc(sub)}</small></div></a>`; };
+    const prods = hh.dataset.ids.split(',').map(i => byId[+i]).filter(Boolean).map(p => card(p).replace('<div class="ph">', '<div class="ph"><span class="hotbadge">Hot</span>'));
+    hh.innerHTML = [vid('shakebox', 'Brookie', 'Το viral μας'), prods[0], vid('fruits', 'Viral fruits', 'Κάθε Τετάρτη νέες γεύσεις'), ...prods.slice(1)].filter(Boolean).join('');
+    watch(hh);
+  }
   if (page === 'catalogue') {
     const grid = $('#grid'), cnt = $('#count'), more = $('#more'), q = $('#q'), res = $('#results'), shelves = $('#shelves');
     $$('.shelf[data-cat]').forEach(el => { const list = inCat(el.dataset.cat); el.innerHTML = list.slice(0, 12).map(card).join(''); });

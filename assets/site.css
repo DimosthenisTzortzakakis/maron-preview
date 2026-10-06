@@ -335,3 +335,4 @@ footer.site{border-top:1px solid var(--line);padding-block:clamp(48px,6vw,80px) 
 .shelf.hot{grid-auto-columns:clamp(200px,24vw,320px)}
 .hotbadge{position:absolute;left:10px;top:10px;z-index:2;background:var(--terra);color:#FBF3EA;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;padding:5px 9px}
 .tabs a.tab{display:inline-block}
+.post .im img{object-position:50% 62%}
