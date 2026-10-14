@@ -488,3 +488,6 @@ form.f .fld input:focus,form.f .fld textarea:focus{box-shadow:0 8px 24px -16px v
 @media (prefers-reduced-motion:reduce){.ahero-bg img,.pcover,.ch-year,.ch-in img{transform:none!important;animation:none!important}.arch-track{animation:none}}
 @media (max-width:700px){.ahero{min-height:calc(100svh - var(--headh) - 70px)}.ahero-in{padding-top:28px;padding-bottom:36px}.ahero .label{margin-top:16px}.ayears{font-size:clamp(56px,20vw,110px);gap:10px 16px}.ayears .dash{width:48px}}
 .post .im img{object-position:50% 68%}.pcover{object-position:50% 58%}
+
+.hero h1.brandline{white-space:nowrap}
+@media (max-width:700px){.hero h1.brandline{font-size:11.5vw;letter-spacing:.12em;margin-right:-.12em}.hero video{object-position:38% 50%}}

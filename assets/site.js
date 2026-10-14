@@ -68,8 +68,8 @@ document.addEventListener('click', e => {
 const hv = $('#heroVid');
 if (hv) {
   const mq = matchMedia('(max-width:700px)');
-  const pick = () => { const src = mq.matches ? 'assets/vid/hero_m.mp4' : 'assets/vid/hero.mp4';
-    if (!hv.src.endsWith(src)) { hv.poster = mq.matches ? 'assets/vid/hero_m.jpg' : 'assets/vid/hero.jpg'; hv.src = src; if (!reduce) hv.play().catch(() => {}); } };
+  const pick = () => { const src = 'assets/vid/hero.mp4';  // same calm shop film on mobile (the reel montage was too busy)
+    if (!hv.src.endsWith(src)) { hv.poster = 'assets/vid/hero.jpg'; hv.src = src; if (!reduce) hv.play().catch(() => {}); } };
   pick(); mq.addEventListener?.('change', pick); if (reduce) hv.pause();
   const hc = $('#heroCtl'), P = '<svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" fill="currentColor"/><rect x="14" y="5" width="4" height="14" fill="currentColor"/></svg>', Y = '<svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z" fill="currentColor"/></svg>';
   const sync = () => { hc.innerHTML = hv.paused ? Y : P; hc.setAttribute('aria-label', hv.paused ? 'Αναπαραγωγή βίντεο' : 'Παύση βίντεο'); };
