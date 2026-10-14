@@ -289,7 +289,7 @@ function applyTheme(k, c) {
   if (T.eyebrow) $('#catEyebrow').textContent = T.eyebrow;
   if (T.lead) $('#catLead').textContent = T.lead;
   $('#catSub').textContent = T.sub || '';
-  const counts = {hearts: 18, sparkle: 26, balloons: 9, candles: 7, petals: 16, confetti: 30, clouds: 7, sprinkles: 26, ribbons: 8, drips: 9};
+  const counts = {hearts: 10, sparkle: 16, petals: 10, confetti: 14};
   $('#catDeco').innerHTML = reduce ? '' : decoHTML(T.deco, counts[T.deco] || 0);
   $('#catSteps').innerHTML = (T.steps || []).map((x, i) => `<div><b>${String(i + 1).padStart(2, '0')}</b><span>${esc(x)}</span></div>`).join('');
   $('#catCtas').innerHTML = T.invite ? '<button class="darkbtn line" type="button" id="invAgain">Η πρόσκληση</button>' : '';
@@ -311,7 +311,7 @@ const seasonMeta = document.querySelector('meta[name="maron-season"]');
 if (seasonMeta) {
   document.body.dataset.season = seasonMeta.content;
   const h = $('.seashero'); const kind = h && h.dataset.deco;
-  const n = {snow: 40, petals: 18, bats: 7, hearts: 22, confetti: 34}[kind] || 0;
+  const n = {snow: 24, petals: 10, bats: 5, hearts: 12, confetti: 16}[kind] || 0;
   if (h && !reduce) $('.catdeco', h).innerHTML = decoHTML(kind, n);
   h && h.classList.add('in');
   $$('.letter').forEach(l => l.addEventListener('click', () => l.classList.toggle('open')));

@@ -623,3 +623,34 @@ body[data-season="apokries"] .seashero .display{background:linear-gradient(90deg
 .letters{padding-bottom:clamp(90px,10vw,150px)}
 .invite[hidden]{display:none}
 .lpaper{opacity:0}.letter.open .lpaper{opacity:1;transition:transform .8s cubic-bezier(.2,.75,.15,1) .25s,opacity .3s .2s}
+
+/* ===== v7b minimal pass: one brand palette, discreet decoration (client: "πολύ κιτς") ===== */
+.cathero,body[data-cat] .cathero,body[data-deco] .cathero{background:linear-gradient(180deg,color-mix(in srgb,var(--sand) 55%,transparent),transparent 85%)!important;color:inherit!important}
+body[data-cat] #catTitle{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:var(--caramel)!important;text-shadow:none!important}
+body[data-cat] .catsub{color:var(--terra)!important}
+body[data-cat] .cathero .label,body[data-cat] .cathero .lead{color:var(--muted)!important}
+body[data-cat="gamou"] #catTitle{font-family:var(--serif);font-style:italic;text-transform:none;letter-spacing:0;font-weight:400}
+body[data-cat="diamond"] .cathero{background:linear-gradient(180deg,#2b1d16,#3a2a20 75%,transparent)!important;color:#f3e6d6!important}
+body[data-cat="diamond"] #catTitle{color:#e9c9a0!important}body[data-cat="diamond"] .cathero .label,body[data-cat="diamond"] .cathero .lead{color:rgba(243,230,214,.8)!important}body[data-cat="diamond"] .catsub{color:#e9c9a0!important}
+/* only these decorations survive, all in palette and quiet */
+.d-candles,.d-balloons,.d-clouds,.d-ribbons,.d-drips,.d-sprinkles{display:none!important}
+.d{opacity:0}
+.d-petals{background:color-mix(in srgb,var(--terra) 35%,var(--sand))!important;width:calc(10px * var(--s))!important;height:calc(7px * var(--s))!important}
+.d-hearts{color:color-mix(in srgb,var(--terra) 60%,transparent)!important;font-size:calc(15px * var(--s))!important}
+.d-sparkle{color:#e9c9a0!important;text-shadow:0 0 8px rgba(233,201,160,.6)!important;font-size:calc(11px * var(--s))!important}
+.d-confetti{background:var(--caramel)!important;opacity:.5}
+.d-confetti:nth-child(3n){background:var(--terra)!important}.d-confetti:nth-child(3n+1){background:var(--sand)!important}
+.d-snow{color:#f3e6d6!important;font-size:calc(10px * var(--s))!important}
+.catsteps div{background:transparent!important}
+/* seasonal heroes in palette */
+.seashero{background:linear-gradient(180deg,color-mix(in srgb,var(--sand) 55%,transparent),transparent 85%)!important}
+.seashero .display{color:var(--caramel)!important;background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important}
+.seashero .catsub{color:var(--terra)!important}
+body[data-season="xristougenna"] .seashero{background:linear-gradient(180deg,#2b1d16,#3a2a20 75%,transparent)!important;color:#f3e6d6}
+body[data-season="xristougenna"] .seashero .display,body[data-season="xristougenna"] .seashero .catsub{color:#e9c9a0!important}
+body[data-season="xristougenna"] .seashero .lead,body[data-season="xristougenna"] .seashero .label{color:rgba(243,230,214,.8)!important}
+body[data-season="halloween"] .seashero{background:radial-gradient(ellipse at 50% 120%,rgba(165,80,47,.35),transparent 60%)!important}
+body[data-season="halloween"] .seashero .display{color:#d07a55!important}
+body[data-season="halloween"]{--caramel:#d07a55;--terra:#d07a55}
+.letter{background:#ead9c7}.letter::before{background:linear-gradient(to top right,#e0cab3 50%,transparent 50%),linear-gradient(to top left,#e0cab3 50%,transparent 50%);background-size:50% 100%;background-position:left,right;background-repeat:no-repeat}
+.lflap{background:#d9c0a6}.lseal{background:var(--terra)}.lpaper b{color:var(--terra)}
