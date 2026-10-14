@@ -654,3 +654,19 @@ body[data-season="halloween"] .seashero .display{color:#d07a55!important}
 body[data-season="halloween"]{--caramel:#d07a55;--terra:#d07a55}
 .letter{background:#ead9c7}.letter::before{background:linear-gradient(to top right,#e0cab3 50%,transparent 50%),linear-gradient(to top left,#e0cab3 50%,transparent 50%);background-size:50% 100%;background-position:left,right;background-repeat:no-repeat}
 .lflap{background:#d9c0a6}.lseal{background:var(--terra)}.lpaper b{color:var(--terra)}
+/* signature collections (products page) */
+.colgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,28px)}
+@media (max-width:900px){.colgrid{grid-template-columns:minmax(0,1fr)}}
+.coltile{position:relative;display:block;overflow:hidden;text-decoration:none;color:#fbf3ea;background:#1c1411;aspect-ratio:4/5}
+@media (max-width:900px){.coltile{aspect-ratio:4/3}}
+.coltile .ph,.coltile img{position:absolute;inset:0;width:100%;height:100%}
+.coltile img{object-fit:cover;transition:transform 1.4s cubic-bezier(.2,.75,.15,1)}
+.coltile:hover img{transform:scale(1.06)}
+.coltile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,13,10,0) 40%,rgba(20,13,10,.78));transition:opacity .6s}
+.coltile .tx{position:absolute;left:clamp(18px,2.4vw,30px);right:clamp(18px,2.4vw,30px);bottom:clamp(18px,2.4vw,30px);z-index:2}
+.coltile .label{color:rgba(251,243,234,.75)}
+.coltile h3{margin:10px 0 4px;font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(26px,2.6vw,38px);line-height:1.05}
+.coltile .script{margin:0;color:#e9c9a0;font-size:17px}
+.coltile .go{display:inline-block;margin-top:16px;font-size:11px;letter-spacing:.26em;text-transform:uppercase;border-bottom:1px solid rgba(251,243,234,.5);padding-bottom:5px;transform:translateY(8px);opacity:0;transition:.5s}
+.coltile:hover .go,.coltile:focus-visible .go{transform:none;opacity:1}
+@media (hover:none){.coltile .go{opacity:1;transform:none}}
