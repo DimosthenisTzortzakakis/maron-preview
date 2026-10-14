@@ -1,6 +1,7 @@
 /* MARON — shared behaviour (prototype). In WordPress the catalogue pages become WooCommerce templates;
    this file keeps only the UI parts (video, reels, menus, filters). */
 (() => {
+const VER = ((document.currentScript && document.currentScript.src.split('?v=')[1]) || String(Date.now())).split('&')[0];
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const esc = s => String(s ?? '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
@@ -96,7 +97,7 @@ if (sig) {
 /* ---------- catalogue (products / category / product pages) ---------- */
 const page = document.body.dataset.page;
 if (['catalogue', 'category', 'product'].includes(page) || $('#homeHot')) {
-  fetch('assets/products.json').then(r => r.json()).then(DB => catalogue(DB)).catch(err => { const m = $('main'); m && m.insertAdjacentHTML('beforeend', `<p class="empty wrap">Δεν φορτώθηκε ο κατάλογος (${esc(err.message)}).</p>`); });
+  fetch(`assets/products.json?v=${VER}`).then(r => r.json()).then(DB => catalogue(DB)).catch(err => { const m = $('main'); m && m.insertAdjacentHTML('beforeend', `<p class="empty wrap">Δεν φορτώθηκε ο κατάλογος (${esc(err.message)}).</p>`); });
 }
 function catalogue(DB) {
   const A = DB.atlas, cats = {}; Object.values(DB.cats).forEach(c => { if (c.key && c.key !== 'other') cats[c.key] = c; });
@@ -107,7 +108,7 @@ function catalogue(DB) {
   const kids = k => Object.values(cats).filter(c => c.parentKey === k);
   const rows = Math.ceil(A.per / A.cols);
   const atl = t => { if (t == null) return 'background:var(--sand)'; const a = Math.floor(t / A.per), j = t % A.per, cx = j % A.cols, cy = Math.floor(j / A.cols);
-    return `background-image:url(assets/atlas/a${String(a).padStart(2, '0')}.webp);background-size:${A.cols * 100}% ${rows * 100}%;background-position:${cx / (A.cols - 1) * 100}% ${cy / (rows - 1) * 100}%`; };
+    return `background-image:url(assets/atlas/a${String(a).padStart(2, '0')}.webp?v=${VER});background-size:${A.cols * 100}% ${rows * 100}%;background-position:${cx / (A.cols - 1) * 100}% ${cy / (rows - 1) * 100}%`; };
   const card = p => `<a class="card" href="proion.html#p${p.id}"><div class="ph"><div class="atl" role="img" aria-label="${esc(p.n)}" style="${atl(p.t)}"></div></div><div class="cap">${esc(p.n)}<small>${esc(cats[p.c[0]]?.name || '')}</small></div></a>`;
   const label = k => k === 'glyka-tourtes' ? 'Τούρτες (γλυκά)' : k === 'pagoto-tourtes' ? 'Τούρτες παγωτό' : cats[k]?.name;
 
@@ -141,11 +142,12 @@ function catalogue(DB) {
     const draw = () => {
       const k = (location.hash.slice(1) || 'tourtes'); const c = cats[k];
       if (!c) { $('#catTitle').textContent = 'Η κατηγορία δεν βρέθηκε'; return; }
-      const list = inCat(k); document.title = `${label(k)} · Patisserie MARON`;
+      const list = inCat(k); document.title = `${(window.CAT_THEME && CAT_THEME[k] && CAT_THEME[k].title) || label(k)} · MARON Patisserie Gelateria`;
       $('#catTitle').textContent = label(k);
       $('#catEyebrow').textContent = c.parentKey ? (label(c.parentKey)) : 'Προϊόντα';
       $('#catLead').textContent = (window.CAT_COPY && CAT_COPY[k]) || `Όλες οι δημιουργίες μας στην κατηγορία «${label(k)}». Πατήστε σε μία για λεπτομέρειες και παραγγελία.`;
       $('#crumbCat').textContent = label(k);
+      applyTheme(k, c);
       const parent = c.parentKey && cats[c.parentKey]; $('#crumbParent').innerHTML = parent && parent.key !== 'proionta' ? `<a href="katigoria.html#${parent.key}">${esc(label(parent.key))}</a> <span aria-hidden="true">/</span>` : '';
       const sib = c.parentKey && c.parentKey !== 'proionta' ? [cats[c.parentKey], ...kids(c.parentKey)] : [c, ...kids(k)];
       $('#subchips').innerHTML = sib.filter(x => x && inCat(x.key).length).map(x => `<a class="chip" href="katigoria.html#${x.key}" ${x.key === k ? 'aria-current="page"' : ''}>${esc(x.key === c.parentKey ? 'Όλα' : (x.key === k && !c.parentKey ? 'Όλα' : label(x.key)))} <small>${inCat(x.key).length}</small></a>`).join('');
@@ -161,10 +163,10 @@ function catalogue(DB) {
     const draw = () => {
       const id = +(location.hash.match(/^#p(\d+)$/) || [])[1]; const p = byId[id] || P[0];
       const c0 = p.c.find(k => cats[k] && k !== 'proionta') || p.c[0]; const c = cats[c0];
-      document.title = `${p.n} · Patisserie MARON`;
+      document.title = `${p.n} · MARON Patisserie Gelateria`;
       $('#pName').textContent = p.n; $('#pMedia').innerHTML = `<div class="atl" role="img" aria-label="${esc(p.alt || p.n)}" style="${atl(p.t)}"></div>`;
       $('#pCat').textContent = label(c0) || 'Προϊόντα';
-      $('#pDesc').innerHTML = p.d ? p.d.split(/\n+/).filter(Boolean).map(x => x.startsWith('<') ? x : `<p>${x}</p>`).join('') : `<p>Ρωτήστε μας για γεύσεις, μεγέθη και διαθεσιμότητα.</p>`;
+      $('#pDesc').innerHTML = p.d ? p.d.split(/\n+/).filter(Boolean).map(x => x.startsWith('<em>') ? `<p class="tagline">${x}</p>` : x.startsWith('<') ? x : `<p>${x}</p>`).join('') : `<p>Ρωτήστε μας για γεύσεις, μεγέθη και διαθεσιμότητα.</p>`;
       $('#pFacts').innerHTML = `<dt>Κατηγορία</dt><dd>${p.c.filter(k => cats[k] && k !== 'proionta').map(k => `<a href="katigoria.html#${k}">${esc(label(k))}</a>`).join(', ')}</dd><dt>Κωδικός</dt><dd>${esc(p.s.toUpperCase().slice(0, 40))}</dd><dt>Παραγγελία</dt><dd>Με μήνυμα στο Instagram ή στο τηλέφωνο</dd>`;
       $('#crumbs').innerHTML = `<a href="index.html">Αρχική</a> <span aria-hidden="true">/</span> <a href="proionta.html">Προϊόντα</a> <span aria-hidden="true">/</span> ${c && c.parentKey && c.parentKey !== 'proionta' ? `<a href="katigoria.html#${c.parentKey}">${esc(label(c.parentKey))}</a> <span aria-hidden="true">/</span> ` : ''}<a href="katigoria.html#${c0}">${esc(label(c0))}</a>`;
       const sibs = inCat(c0); const i = sibs.findIndex(x => x.id === p.id); const prev = sibs[(i - 1 + sibs.length) % sibs.length], next = sibs[(i + 1) % sibs.length];
@@ -271,6 +273,49 @@ $$('#homeHot, [data-reels]').forEach(row => {
   row.addEventListener('dragstart', e => e.preventDefault());
 });
 
+
+/* ---------- category character: themed hero, decorations, wedding invitation ---------- */
+function decoHTML(kind, n) {
+  const rnd = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
+  const G = {hearts: '♥', sparkle: '✦', balloons: '', candles: '', petals: '', confetti: '', clouds: '☁', sprinkles: '', ribbons: '', drips: '', bats: '', snow: '❄', letters: ''};
+  if (!(kind in G)) return '';
+  return Array.from({length: n}, (_, i) => `<i class="d d-${kind}" style="--x:${rnd(0, 100)}%;--y:${rnd(0, 100)}%;--s:${rnd(.6, 1.4)};--t:${rnd(5, 12)}s;--dl:-${rnd(0, 12)}s;--h:${Math.floor(Math.random() * 360)}">${G[kind]}</i>`).join('');
+}
+window.MARON_deco = decoHTML;
+function applyTheme(k, c) {
+  const T = (window.CAT_THEME || {})[k] || (window.CAT_THEME || {})[c.parentKey] || {};
+  document.body.dataset.cat = k; document.body.dataset.deco = T.deco || '';
+  if (T.title) $('#catTitle').textContent = T.title;
+  if (T.eyebrow) $('#catEyebrow').textContent = T.eyebrow;
+  if (T.lead) $('#catLead').textContent = T.lead;
+  $('#catSub').textContent = T.sub || '';
+  const counts = {hearts: 18, sparkle: 26, balloons: 9, candles: 7, petals: 16, confetti: 30, clouds: 7, sprinkles: 26, ribbons: 8, drips: 9};
+  $('#catDeco').innerHTML = reduce ? '' : decoHTML(T.deco, counts[T.deco] || 0);
+  $('#catSteps').innerHTML = (T.steps || []).map((x, i) => `<div><b>${String(i + 1).padStart(2, '0')}</b><span>${esc(x)}</span></div>`).join('');
+  $('#catCtas').innerHTML = T.invite ? '<button class="darkbtn line" type="button" id="invAgain">Η πρόσκληση</button>' : '';
+  const hero = $('#catHero'); hero.classList.remove('in'); void hero.offsetWidth; hero.classList.add('in');
+  if (T.invite) { $('#invAgain').onclick = () => openInvite(true); let seen = false; try { seen = sessionStorage.getItem('maronInvite') === '1'; } catch (e) {} if (!seen) openInvite(false); }
+}
+function openInvite(again) {
+  const inv = $('#invite'); if (!inv) return;
+  inv.hidden = false; document.documentElement.style.overflow = 'hidden';
+  requestAnimationFrame(() => requestAnimationFrame(() => inv.classList.add('open')));
+  const close = () => { inv.classList.add('leaving'); try { sessionStorage.setItem('maronInvite', '1'); } catch (e) {}
+    setTimeout(() => { inv.hidden = true; inv.classList.remove('open', 'leaving'); document.documentElement.style.overflow = ''; $('#grid').scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'start'}); }, reduce ? 0 : 700); };
+  $('#invOpen').onclick = close; $('#invOpen').focus({preventScroll: true});
+  inv.onkeydown = e => { if (e.key === 'Escape') close(); };
+}
+
+/* ---------- seasonal pages: themed decorations + valentine letters ---------- */
+const seasonMeta = document.querySelector('meta[name="maron-season"]');
+if (seasonMeta) {
+  document.body.dataset.season = seasonMeta.content;
+  const h = $('.seashero'); const kind = h && h.dataset.deco;
+  const n = {snow: 40, petals: 18, bats: 7, hearts: 22, confetti: 34}[kind] || 0;
+  if (h && !reduce) $('.catdeco', h).innerHTML = decoHTML(kind, n);
+  h && h.classList.add('in');
+  $$('.letter').forEach(l => l.addEventListener('click', () => l.classList.toggle('open')));
+}
 /* ---------- forms (prototype: no backend yet) ---------- */
 $$('form.f').forEach(f => f.addEventListener('submit', e => { e.preventDefault(); const ok = f.querySelector('.ok') || f.appendChild(Object.assign(document.createElement('p'), {className: 'ok full'}));
   ok.textContent = 'Το draft δεν στέλνει ακόμα: στο WordPress η φόρμα θα πηγαίνει στο info@maron-glykos.gr.'; }));
