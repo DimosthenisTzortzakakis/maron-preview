@@ -178,6 +178,71 @@ function catalogue(DB) {
   }
 }
 
+/* ---------- motion layer (home): intro, parallax, reveals, tilt, drag rows, counters ---------- */
+if (document.body.dataset.page === 'home' && !reduce) {
+  const root = document.documentElement; root.classList.add('js-motion');
+  // hero: split MARON into letters, scroll cue
+  const h1 = $('#heroTitle');
+  if (h1) { const t = h1.textContent; h1.setAttribute('aria-label', t);
+    h1.innerHTML = [...t].map((c, i) => `<span class="ch" aria-hidden="true" style="--i:${i}">${esc(c)}</span>`).join(''); }
+  const hero = $('#hero'); hero && hero.insertAdjacentHTML('beforeend', '<span class="scrollcue" aria-hidden="true"></span>');
+  document.body.insertAdjacentHTML('afterbegin', '<div class="scrollbar" aria-hidden="true"></div>');
+  const bar = $('.scrollbar'), track = $('.mq-track');
+  // scroll-linked: progress bar, hero parallax, marquee speed follows scroll velocity
+  let lastY = scrollY, vel = 0, mx = 0, ticking = false;
+  const onScroll = () => { if (ticking) return; ticking = true; requestAnimationFrame(() => {
+    const y = scrollY, max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.setProperty('--sp', max > 0 ? (y / max).toFixed(4) : 0);
+    if (hero) hero.style.setProperty('--hp', Math.min(1, Math.max(0, y / hero.offsetHeight)).toFixed(3));
+    vel += (y - lastY) * .35; lastY = y; ticking = false; }); };
+  addEventListener('scroll', onScroll, {passive: true}); onScroll();
+  if (track) { const loop = () => { const half = track.scrollWidth / 2; vel *= .92;
+      mx -= .6 + Math.abs(vel) * .08 * Math.sign(vel || 1); if (mx < -half) mx += half; if (mx > 0) mx -= half;
+      track.style.setProperty('--mx', mx.toFixed(1) + 'px'); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop); }
+  // reveals
+  const mark = (sel, cls = 'rv', stagger = true) => $$(sel).forEach((el, i) => { el.classList.add(cls); if (stagger) el.style.setProperty('--d', i % 4); });
+  mark('main .head, main .shelfhead', 'rvl', false); $$('main .head, main .shelfhead').forEach(el => el.classList.add('rv'));
+  mark('.cats .cattile'); mark('.posts .post'); mark('.stores > *'); mark('#istoria .split > *'); mark('.galatsi .split > *');
+  $$('.galatsi').forEach(el => el.classList.add('rvg'));
+  const rio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rio.unobserve(e.target); } }), {threshold: .18, rootMargin: '0px 0px -6% 0px'});
+  $$('.rv, .rvl, .rvg').forEach(el => rio.observe(el));
+  // counters
+  const count = el => { const to = +el.dataset.count, t0 = performance.now(), d = 1600;
+    const step = now => { const k = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(to * e).toLocaleString('el-GR'); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step); };
+  const cio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { count(e.target); cio.unobserve(e.target); } }), {threshold: .6});
+  $$('[data-count]').forEach(el => { el.textContent = '0'; cio.observe(el); });
+  // category tiles: 3D tilt + glare (fine pointers only)
+  if (matchMedia('(hover:hover) and (pointer:fine)').matches) $$('.cattile').forEach(t => {
+    t.insertAdjacentHTML('beforeend', '<span class="glare" aria-hidden="true"></span>');
+    t.addEventListener('pointermove', e => { const r = t.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      t.classList.add('tilting'); t.style.setProperty('--rx', ((x - .5) * 10).toFixed(2) + 'deg'); t.style.setProperty('--ry', ((.5 - y) * 10).toFixed(2) + 'deg');
+      t.style.setProperty('--gx', (x * 100).toFixed(1) + '%'); t.style.setProperty('--gy', (y * 100).toFixed(1) + '%'); });
+    t.addEventListener('pointerleave', () => { t.classList.remove('tilting'); t.style.setProperty('--rx', '0deg'); t.style.setProperty('--ry', '0deg'); });
+  });
+  // signature tabs: stagger the cards on every switch
+  const sg = $('#sigGrid'); sg && new MutationObserver(() => $$('.card', sg).forEach((c, i) => c.style.setProperty('--d', i))).observe(sg, {childList: true});
+  sg && $$('.card', sg).forEach((c, i) => c.style.setProperty('--d', i));
+}
+/* horizontal rows (hot shelf, reels): mouse drag + arrow buttons */
+$$('#homeHot, [data-reels]').forEach(row => {
+  row.classList.add('dragrow');
+  const ctl = document.createElement('div'); ctl.className = 'rowctl';
+  ctl.innerHTML = '<button type="button" aria-label="Προηγούμενα">←</button><button type="button" aria-label="Επόμενα">→</button>';
+  row.before(ctl); const [pv, nx] = $$('button', ctl);
+  const by = dir => row.scrollBy({left: dir * row.clientWidth * .8, behavior: reduce ? 'auto' : 'smooth'});
+  pv.onclick = () => by(-1); nx.onclick = () => by(1);
+  const upd = () => { pv.disabled = row.scrollLeft < 4; nx.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4; };
+  row.addEventListener('scroll', upd, {passive: true}); addEventListener('resize', upd); setTimeout(upd, 600);
+  let down = false, sx = 0, sl = 0, moved = 0;
+  row.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; moved = 0; sx = e.clientX; sl = row.scrollLeft; });
+  addEventListener('pointermove', e => { if (!down) return; const dx = e.clientX - sx; moved = Math.max(moved, Math.abs(dx));
+    if (moved > 5) { row.classList.add('dragging'); row.scrollLeft = sl - dx; } });
+  addEventListener('pointerup', () => { if (!down) return; down = false; setTimeout(() => row.classList.remove('dragging'), 0); });
+  row.addEventListener('dragstart', e => e.preventDefault());
+});
+
 /* ---------- forms (prototype: no backend yet) ---------- */
 $$('form.f').forEach(f => f.addEventListener('submit', e => { e.preventDefault(); const ok = f.querySelector('.ok') || f.appendChild(Object.assign(document.createElement('p'), {className: 'ok full'}));
   ok.textContent = 'Το draft δεν στέλνει ακόμα: στο WordPress η φόρμα θα πηγαίνει στο info@maron-glykos.gr.'; }));
