@@ -225,6 +225,34 @@ if (document.body.dataset.page === 'home' && !reduce) {
   const sg = $('#sigGrid'); sg && new MutationObserver(() => $$('.card', sg).forEach((c, i) => c.style.setProperty('--d', i))).observe(sg, {childList: true});
   sg && $$('.card', sg).forEach((c, i) => c.style.setProperty('--d', i));
 }
+/* ---------- motion layer (about / blog / post / contact) — products pages stay static on purpose ---------- */
+if (['about', 'blog', 'post', 'contact'].includes(document.body.dataset.page) && !reduce) {
+  const pg = document.body.dataset.page; document.documentElement.classList.add('js-motion');
+  document.body.insertAdjacentHTML('afterbegin', '<div class="scrollbar" aria-hidden="true"></div>');
+  const bar = $('.scrollbar');
+  const io2 = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io2.unobserve(e.target); } }), {threshold: .15, rootMargin: '0px 0px -8% 0px'});
+  const mark = (sel, cls = 'rv') => $$(sel).forEach((el, i) => { el.classList.add(cls); el.style.setProperty('--d', i % 3); io2.observe(el); });
+  mark('main .head'); mark('.posts .post'); mark('.stores > *'); mark('.contacts .box'); mark('form.f > *'); mark('main .split > div > h2');
+  $$('.prose > *').forEach(el => io2.observe(el));
+  // timeline chapters: reveal + count the year up from the previous chapter
+  const chs = $$('.ch'); let prevYear = 1983;
+  const yio = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const el = e.target; yio.unobserve(el);
+    const to = +el.dataset.year, from = +el.dataset.from, t0 = performance.now();
+    const step = now => { const k = Math.min(1, (now - t0) / 1300), v = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))); el.textContent = v; if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step); }), {threshold: .3});
+  chs.forEach(c => { const tio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { c.classList.add('in'); tio.disconnect(); } }), {threshold: .12}); tio.observe(c);
+    const y = $('[data-year]', c); if (y) { y.dataset.from = prevYear === +y.dataset.year ? prevYear - 30 : prevYear; prevYear = +y.dataset.year; yio.observe(y); } });
+  const hero = $('.ahero'), tl = $('.tline'), cover = $('.pcover');
+  let tk = false;
+  const frame = () => { tk = false; const y = scrollY, vh = innerHeight, max = document.documentElement.scrollHeight - vh;
+    bar.style.setProperty('--sp', max > 0 ? (y / max).toFixed(4) : 0);
+    if (hero) hero.style.setProperty('--hp', Math.min(1, y / hero.offsetHeight).toFixed(3));
+    if (tl) { const r = tl.getBoundingClientRect(); tl.style.setProperty('--tp', Math.min(1, Math.max(0, (vh * .55 - r.top) / r.height)).toFixed(4));
+      chs.forEach(c => { const b = c.getBoundingClientRect(); if (b.bottom < -200 || b.top > vh + 200) return; const k = (b.top + b.height / 2 - vh / 2) / vh;
+        c.style.setProperty('--iy', (-8 - k * 8).toFixed(2)); const yr = $('.ch-year', c); yr && yr.style.setProperty('--py', (k * 36).toFixed(1)); }); }
+    if (cover) { const r = cover.getBoundingClientRect(); cover.style.setProperty('--cp', Math.min(1, Math.max(0, 1 - r.bottom / (vh + r.height))).toFixed(3)); } };
+  addEventListener('scroll', () => { if (!tk) { tk = true; requestAnimationFrame(frame); } }, {passive: true}); addEventListener('resize', frame); frame();
+}
 /* horizontal rows (hot shelf, reels): mouse drag + arrow buttons */
 $$('#homeHot, [data-reels]').forEach(row => {
   row.classList.add('dragrow');
