@@ -104,7 +104,11 @@ function catalogue(DB) {
   const anc = k => { const out = []; let c = cats[k]; while (c) { out.push(c.key); c = c.parentKey && cats[c.parentKey]; } return out; };
   const P = DB.products.map(p => ({...p, all: [...new Set(p.c.flatMap(anc))]}));
   const byId = Object.fromEntries(P.map(p => [p.id, p]));
-  const inCat = k => P.filter(p => p.all.includes(k));
+  // ranking: signature collections first (interleaved wedding / diamond / vintage), then restyled photos, then the rest
+  const COLK = ['gamou', 'diamond', 'vintage'], colIdx = {};
+  COLK.forEach(k => P.filter(p => p.id >= 910000 && p.c.includes(k)).forEach((p, i) => colIdx[p.id] = i * 3 + COLK.indexOf(k)));
+  const rank = p => p.id in colIdx ? colIdx[p.id] : (p.r ? 1000 : 100000);
+  const inCat = k => P.filter(p => p.all.includes(k)).sort((a, b) => rank(a) - rank(b));
   const kids = k => Object.values(cats).filter(c => c.parentKey === k);
   const rows = Math.ceil(A.per / A.cols);
   const atl = t => { if (t == null) return 'background:var(--sand)'; const a = Math.floor(t / A.per), j = t % A.per, cx = j % A.cols, cy = Math.floor(j / A.cols);
@@ -121,7 +125,9 @@ function catalogue(DB) {
 
   const hh = $('#homeHot');
   if (hh) {
-    const vid = (k, n, sub) => { const r = REELS[k]; return `<a class="card" href="${r.ig ? igUrl(r) : ttUrl(r)}" target="_blank" rel="noopener"><div class="ph"><span class="hotbadge">Hot</span><video src="assets/vid/${k}.mp4" poster="assets/vid/${k}.jpg" muted loop playsinline preload="none" data-auto aria-hidden="true"></video></div><div class="cap">${esc(n)}<small>${esc(sub)}</small></div></a>`; };
+    // photo first; the reel opens on demand (client: no autoplaying videos in Hot)
+    const HOTIMG = {shakebox: 'assets/img/gen/hot-brookie.webp', fruits: 'assets/img/gen/hot-fruits.webp'};
+    const vid = (k, n, sub) => `<button type="button" class="card hotvid" data-v="${k}" data-n="${esc(n)}" data-img="${HOTIMG[k]}"><div class="ph"><span class="hotbadge">Hot</span><img src="${HOTIMG[k]}" onerror="this.onerror=null;this.src='assets/vid/${k}.jpg'" alt="${esc(n)}" loading="lazy"><span class="playhint" aria-hidden="true">▶</span></div><div class="cap">${esc(n)}<small>${esc(sub)}</small></div></button>`;
     const prods = hh.dataset.ids.split(',').map(i => byId[+i]).filter(Boolean).map(p => card(p).replace('<div class="ph">', '<div class="ph"><span class="hotbadge">Hot</span>'));
     hh.innerHTML = [vid('shakebox', 'Brookie', 'Το viral μας'), prods[0], vid('fruits', 'Viral fruits', 'Κάθε Τετάρτη νέες γεύσεις'), ...prods.slice(1)].filter(Boolean).join('');
     watch(hh);
@@ -316,6 +322,21 @@ if (seasonMeta) {
   h && h.classList.add('in');
   $$('.letter').forEach(l => l.addEventListener('click', () => l.classList.toggle('open')));
 }
+
+/* ---------- hot item modal: photo + optional video ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('.hotvid'); if (!b) return;
+  const k = b.dataset.v, r = REELS[k] || {};
+  let m = $('#vmodal'); if (!m) { document.body.insertAdjacentHTML('beforeend', '<div class="vmodal" id="vmodal" hidden role="dialog" aria-modal="true"><div class="vbox"><button class="vclose" type="button" aria-label="Κλείσιμο">×</button><div class="vmedia"></div><div class="vtx"></div></div></div>'); m = $('#vmodal'); }
+  const media = $('.vmedia', m);
+  media.innerHTML = `<img src="${b.dataset.img}" onerror="this.onerror=null;this.src='assets/vid/${k}.jpg'" alt="">`;
+  $('.vtx', m).innerHTML = `<h3>${esc(b.dataset.n)}</h3><div class="vbtns"><button class="darkbtn" type="button" id="vplay">▶ Δείτε το βίντεο</button><a class="darkbtn line" href="${r.ig ? igUrl(r) : ttUrl(r)}" target="_blank" rel="noopener">${r.ig ? 'Instagram' : 'TikTok'} ↗</a></div>`;
+  m.hidden = false; requestAnimationFrame(() => m.classList.add('open'));
+  $('#vplay').onclick = () => { media.innerHTML = `<video src="assets/vid/${k}.mp4" poster="assets/vid/${k}.jpg" controls autoplay playsinline></video>`; };
+  const close = () => { m.classList.remove('open'); setTimeout(() => { m.hidden = true; media.innerHTML = ''; }, 300); };
+  $('.vclose', m).onclick = close; m.onclick = ev => { if (ev.target === m) close(); };
+  document.addEventListener('keydown', function esc_(ev) { if (ev.key === 'Escape') { close(); document.removeEventListener('keydown', esc_); } });
+});
 /* ---------- forms (prototype: no backend yet) ---------- */
 $$('form.f').forEach(f => f.addEventListener('submit', e => { e.preventDefault(); const ok = f.querySelector('.ok') || f.appendChild(Object.assign(document.createElement('p'), {className: 'ok full'}));
   ok.textContent = 'Το draft δεν στέλνει ακόμα: στο WordPress η φόρμα θα πηγαίνει στο info@maron-glykos.gr.'; }));

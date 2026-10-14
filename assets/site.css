@@ -670,3 +670,25 @@ body[data-season="halloween"]{--caramel:#d07a55;--terra:#d07a55}
 .coltile .go{display:inline-block;margin-top:16px;font-size:11px;letter-spacing:.26em;text-transform:uppercase;border-bottom:1px solid rgba(251,243,234,.5);padding-bottom:5px;transform:translateY(8px);opacity:0;transition:.5s}
 .coltile:hover .go,.coltile:focus-visible .go{transform:none;opacity:1}
 @media (hover:none){.coltile .go{opacity:1;transform:none}}
+
+[hidden]{display:none!important}
+/* soft fade from the page into the footer */
+footer.site{position:relative}
+footer.site::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:clamp(60px,8vw,120px);background:linear-gradient(to bottom,transparent,color-mix(in srgb,var(--sand) 60%,transparent));pointer-events:none}
+footer.site{background:color-mix(in srgb,var(--sand) 60%,var(--cream));border-top:0}
+
+button.card.hotvid{border:0;padding:0;background:none;font:inherit;color:inherit;text-align:inherit;cursor:pointer;width:100%}
+.hotvid .ph{position:relative}
+.hotvid .ph img{width:100%;height:100%;object-fit:cover}
+.playhint{position:absolute;right:12px;bottom:12px;width:36px;height:36px;border-radius:50%;background:rgba(251,243,234,.9);color:var(--cacao);display:grid;place-items:center;font-size:12px;padding-left:2px}
+.vmodal{position:fixed;inset:0;z-index:110;display:grid;place-items:center;padding:20px;background:rgba(24,16,12,0);transition:background .3s}
+.vmodal.open{background:rgba(24,16,12,.75)}
+.vbox{position:relative;background:var(--cream);width:min(860px,100%);max-height:calc(100svh - 40px);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);overflow:hidden;transform:translateY(20px);opacity:0;transition:.35s}
+.vmodal.open .vbox{transform:none;opacity:1}
+.vmedia{background:#140d0a;aspect-ratio:4/5;max-height:calc(100svh - 40px)}
+.vmedia img,.vmedia video{width:100%;height:100%;object-fit:cover;display:block}
+.vtx{padding:clamp(22px,3vw,40px);display:flex;flex-direction:column;justify-content:center;gap:18px}
+.vtx h3{margin:0;font-weight:500;font-size:clamp(28px,3vw,40px);text-transform:uppercase;letter-spacing:-.02em;color:var(--caramel)}
+.vbtns{display:flex;gap:10px;flex-wrap:wrap}
+.vclose{position:absolute;right:10px;top:8px;z-index:2;width:40px;height:40px;border:0;border-radius:50%;background:rgba(251,243,234,.9);font-size:24px;line-height:1;cursor:pointer;color:#2b1d16}
+@media (max-width:700px){.vbox{grid-template-columns:minmax(0,1fr)}.vmedia{aspect-ratio:4/5;max-height:62svh}}
