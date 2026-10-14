@@ -226,13 +226,13 @@ if (document.body.dataset.page === 'home' && !reduce) {
   sg && $$('.card', sg).forEach((c, i) => c.style.setProperty('--d', i));
 }
 /* ---------- motion layer (about / blog / post / contact) — products pages stay static on purpose ---------- */
-if (['about', 'blog', 'post', 'contact'].includes(document.body.dataset.page) && !reduce) {
+if (['about', 'blog', 'post', 'contact', 'seasonal'].includes(document.body.dataset.page) && !reduce) {
   const pg = document.body.dataset.page; document.documentElement.classList.add('js-motion');
   document.body.insertAdjacentHTML('afterbegin', '<div class="scrollbar" aria-hidden="true"></div>');
   const bar = $('.scrollbar');
   const io2 = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io2.unobserve(e.target); } }), {threshold: .15, rootMargin: '0px 0px -8% 0px'});
   const mark = (sel, cls = 'rv') => $$(sel).forEach((el, i) => { el.classList.add(cls); el.style.setProperty('--d', i % 3); io2.observe(el); });
-  mark('main .head'); mark('.posts .post'); mark('.stores > *'); mark('.contacts .box'); mark('form.f > *'); mark('main .split > div > h2');
+  mark('main .head'); mark('.posts .post'); mark('.stores > *'); mark('.contacts .box'); mark('form.f > *'); mark('main .split > div > h2'); mark('.seasgrid .seascard');
   $$('.prose > *').forEach(el => io2.observe(el));
   // timeline chapters: reveal + count the year up from the previous chapter
   const chs = $$('.ch'); let prevYear = 1983;
@@ -259,8 +259,8 @@ $$('#homeHot, [data-reels]').forEach(row => {
   const ctl = document.createElement('div'); ctl.className = 'rowctl';
   ctl.innerHTML = '<button type="button" aria-label="Προηγούμενα">←</button><button type="button" aria-label="Επόμενα">→</button>';
   row.before(ctl); const [pv, nx] = $$('button', ctl);
-  const by = dir => row.scrollBy({left: dir * row.clientWidth * .8, behavior: reduce ? 'auto' : 'smooth'});
-  pv.onclick = () => by(-1); nx.onclick = () => by(1);
+  const by = dir => { row.style.scrollSnapType = 'none'; row.scrollBy({left: dir * row.clientWidth * .8, behavior: reduce ? 'auto' : 'smooth'}); clearTimeout(row._snap); row._snap = setTimeout(() => row.style.scrollSnapType = '', 700); };
+  pv.onclick = e => { e.preventDefault(); e.stopPropagation(); by(-1); }; nx.onclick = e => { e.preventDefault(); e.stopPropagation(); by(1); };
   const upd = () => { pv.disabled = row.scrollLeft < 4; nx.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4; };
   row.addEventListener('scroll', upd, {passive: true}); addEventListener('resize', upd); setTimeout(upd, 600);
   let down = false, sx = 0, sl = 0, moved = 0;
