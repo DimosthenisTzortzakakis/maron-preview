@@ -77,18 +77,16 @@ if (hv) {
   hc.onclick = () => hv.paused ? hv.play() : hv.pause(); hv.addEventListener('play', sync); hv.addEventListener('pause', sync); sync();
 }
 
-/* ---------- home: signature tabs (curated photos & videos → category pages) ---------- */
-const sig = $('#sigGrid');
-if (sig) {
+/* ---------- home: signature tabs — real products (rendered once the catalogue is loaded) ---------- */
+function renderSig(card, byId) {
+  const sig = $('#sigGrid'); if (!sig) return;
   const SIG = JSON.parse($('#sigData').textContent);
   const tabs = $('#sigTabs'), intro = $('#sigIntro');
   const render = id => { const c = SIG.find(x => x.id === id) || SIG[0];
     $$('.tab', tabs).forEach(b => b.setAttribute('aria-selected', b.dataset.id === c.id));
     intro.innerHTML = `${esc(c.intro)} <a class="textlink" style="margin:0 0 0 8px" href="${c.href}">Όλα (${c.total}) →</a>`;
-    sig.innerHTML = c.items.slice(0, 4).map(it => it.v
-      ? `<a class="card" href="${REELS[it.v].ig ? igUrl(REELS[it.v]) : ttUrl(REELS[it.v])}" target="_blank" rel="noopener"><div class="ph"><video src="assets/vid/${it.v}.mp4" poster="assets/vid/${it.v}.jpg" muted loop playsinline preload="none" data-auto aria-hidden="true"></video><span class="badge"><i></i>Video</span></div><div class="cap">${esc(it.n)}<small>Δείτε το βίντεο</small></div></a>`
-      : `<a class="card" href="${it.href || c.href}"><div class="ph"><img src="${it.img}" alt="${esc(it.n)}" loading="lazy"></div><div class="cap">${esc(it.n)}</div></a>`).join('');
-    watch(sig); };
+    sig.innerHTML = c.ids ? c.ids.map(i => byId[i]).filter(Boolean).slice(0, 8).map(card).join('')
+      : (c.items || []).slice(0, 8).map(it => `<a class="card" href="${it.href}"><div class="ph"><img src="${it.img}" alt="${esc(it.n)}" loading="lazy"></div><div class="cap">${esc(it.n)}</div></a>`).join(''); };
   tabs.innerHTML = SIG.map(c => `<button class="tab" role="tab" data-id="${c.id}">${esc(c.name)}</button>`).join('');
   tabs.onclick = e => { const b = e.target.closest('.tab'); if (b) render(b.dataset.id); };
   render(SIG[0].id);
@@ -123,6 +121,7 @@ function catalogue(DB) {
   }
   const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
+  renderSig(card, byId);
   const hh = $('#homeHot');
   if (hh) {
     // photo first; the reel opens on demand (client: no autoplaying videos in Hot)
