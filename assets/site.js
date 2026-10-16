@@ -262,7 +262,7 @@ if (['about', 'blog', 'post', 'contact', 'seasonal', 'events'].includes(document
   addEventListener('scroll', () => { if (!tk) { tk = true; requestAnimationFrame(frame); } }, {passive: true}); addEventListener('resize', frame); frame();
 }
 /* horizontal rows (hot shelf, reels): mouse drag + arrow buttons */
-$$('#homeHot, [data-reels]').forEach(row => {
+$$('#homeHot, #celebRow, [data-reels]').forEach(row => {
   row.classList.add('dragrow');
   const ctl = document.createElement('div'); ctl.className = 'rowctl';
   ctl.innerHTML = '<button type="button" aria-label="Προηγούμενα">←</button><button type="button" aria-label="Επόμενα">→</button>';
@@ -336,6 +336,18 @@ document.addEventListener('click', e => {
   const close = () => { m.classList.remove('open'); setTimeout(() => { m.hidden = true; media.innerHTML = ''; }, 300); };
   $('.vclose', m).onclick = close; m.onclick = ev => { if (ev.target === m) close(); };
   document.addEventListener('keydown', function esc_(ev) { if (ev.key === 'Escape') { close(); document.removeEventListener('keydown', esc_); } });
+});
+
+/* ---------- celebrity cakes: full reel with sound on demand ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('.celebvid'); if (!b) return;
+  let m = $('#vmodal'); if (!m) { document.body.insertAdjacentHTML('beforeend', '<div class="vmodal" id="vmodal" hidden role="dialog" aria-modal="true"><div class="vbox"><button class="vclose" type="button" aria-label="Κλείσιμο">×</button><div class="vmedia"></div><div class="vtx"></div></div></div>'); m = $('#vmodal'); }
+  const media = $('.vmedia', m), k = b.dataset.k;
+  media.innerHTML = `<video src="assets/vid/${k}.mp4" poster="assets/vid/${k}.jpg" controls autoplay playsinline></video>`;
+  $('.vtx', m).innerHTML = `<p class="label">Τούρτες διασήμων</p><h3>${esc(b.dataset.n)}</h3><div class="vbtns"><a class="darkbtn line" href="${b.dataset.link}" target="_blank" rel="noopener">${esc(b.dataset.where)} ↗</a></div>`;
+  m.hidden = false; requestAnimationFrame(() => m.classList.add('open'));
+  const close = () => { m.classList.remove('open'); setTimeout(() => { m.hidden = true; media.innerHTML = ''; }, 300); };
+  $('.vclose', m).onclick = close; m.onclick = ev => { if (ev.target === m) close(); };
 });
 /* ---------- forms (prototype: no backend yet) ---------- */
 $$('form.f').forEach(f => f.addEventListener('submit', e => { e.preventDefault(); const ok = f.querySelector('.ok') || f.appendChild(Object.assign(document.createElement('p'), {className: 'ok full'}));

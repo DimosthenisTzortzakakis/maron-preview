@@ -752,3 +752,11 @@ a.seascard{display:block;text-decoration:none;color:inherit}
 .evformwrap .head .lead{margin-inline:auto}
 .evformwrap .checks{justify-content:center}
 .evformwrap legend{text-align:center;width:100%}
+
+/* celebrity cakes shelf */
+button.card.celebvid{border:0;padding:0;background:none;font:inherit;color:inherit;text-align:inherit;cursor:pointer;width:100%}
+.celebvid .ph,.celebph .ph{position:relative}
+.celebvid video,.celebph img{width:100%;height:100%;object-fit:cover;display:block}
+a.celebph{text-decoration:none;color:inherit}
+.shelf.celeb .card{flex:0 0 auto}
+.shelf.celeb{grid-auto-columns:clamp(200px,24vw,320px)}
