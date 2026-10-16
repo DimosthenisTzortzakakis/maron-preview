@@ -180,6 +180,7 @@ function catalogue(DB) {
       const rel = sibs.filter(x => x.id !== p.id); const start = Math.max(0, i); $('#related').innerHTML = rel.slice(start, start + 8).concat(rel.slice(0, Math.max(0, 8 - rel.slice(start).length))).slice(0, 8).map(card).join('');
       $('#relMore').href = `katigoria.html#${c0}`; $('#relMore').textContent = `Όλες οι ${label(c0)} (${sibs.length}) →`;
       $('#pOld').textContent = p.old;
+      const of = $('#orderForm'); if (of) { const isCake = p.c.some(k => anc(k).includes('tourtes')); of.hidden = !isCake; $('#ofProduct').value = `${p.n} (#${p.id})`; of.open = false; }
       window.scrollTo(0, 0);
     };
     addEventListener('hashchange', draw); draw();
@@ -234,7 +235,7 @@ if (document.body.dataset.page === 'home' && !reduce) {
   sg && $$('.card', sg).forEach((c, i) => c.style.setProperty('--d', i));
 }
 /* ---------- motion layer (about / blog / post / contact) — products pages stay static on purpose ---------- */
-if (['about', 'blog', 'post', 'contact', 'seasonal'].includes(document.body.dataset.page) && !reduce) {
+if (['about', 'blog', 'post', 'contact', 'seasonal', 'events'].includes(document.body.dataset.page) && !reduce) {
   const pg = document.body.dataset.page; document.documentElement.classList.add('js-motion');
   document.body.insertAdjacentHTML('afterbegin', '<div class="scrollbar" aria-hidden="true"></div>');
   const bar = $('.scrollbar');
