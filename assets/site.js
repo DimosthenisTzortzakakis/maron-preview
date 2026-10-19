@@ -192,7 +192,7 @@ if (document.body.dataset.page === 'home' && !reduce) {
   // hero: split MARON into letters, scroll cue
   const h1 = $('#heroTitle');
   if (h1) { const t = h1.textContent; h1.setAttribute('aria-label', t);
-    h1.innerHTML = [...t].map((c, i) => `<span class="ch" aria-hidden="true" style="--i:${i}">${esc(c)}</span>`).join(''); }
+    h1.innerHTML = [...t].map((c, i) => `<span class="hl" aria-hidden="true" style="--i:${i}">${esc(c)}</span>`).join(''); }
   const hero = $('#hero'); hero && hero.insertAdjacentHTML('beforeend', '<span class="scrollcue" aria-hidden="true"></span>');
   document.body.insertAdjacentHTML('afterbegin', '<div class="scrollbar" aria-hidden="true"></div>');
   const bar = $('.scrollbar'), track = $('.mq-track');
