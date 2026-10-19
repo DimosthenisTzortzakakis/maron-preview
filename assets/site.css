@@ -763,3 +763,7 @@ a.celebph{text-decoration:none;color:inherit}
 /* client 2026-10-19: MARON wordmark letters closer (header) — mobile like desktop */
 .brand span{letter-spacing:.24em}
 @media (max-width:700px){.brand span{letter-spacing:.14em;font-size:15px}}
+/* 2026-10-19: iOS Safari spread the split letters across the width — lay them out explicitly */
+.hero h1.brandline{display:flex!important;justify-content:center;align-items:baseline;gap:.08em;letter-spacing:0!important;margin-right:0!important;text-wrap:nowrap!important;white-space:nowrap;word-spacing:0;width:auto;max-width:100%}
+.hero h1.brandline .ch{letter-spacing:0;flex:0 0 auto}
+@media (max-width:700px){.hero h1.brandline{gap:.035em;font-size:13vw!important}}
