@@ -767,3 +767,4 @@ a.celebph{text-decoration:none;color:inherit}
 .hero h1.brandline{display:flex!important;justify-content:center;align-items:baseline;gap:.08em;letter-spacing:0!important;margin-right:0!important;text-wrap:nowrap!important;white-space:nowrap;word-spacing:0;width:auto;max-width:100%}
 .hero h1.brandline .hl{letter-spacing:0;flex:0 0 auto;padding:0;margin:0;display:inline-block}
 @media (max-width:700px){.hero h1.brandline{gap:.035em;font-size:13vw!important}}
+@media (max-width:700px){.hero h1.brandline{font-size:17vw!important;gap:.05em}.hero #heroEyebrow{letter-spacing:.16em;font-size:10px}}
