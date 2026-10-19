@@ -22,6 +22,7 @@ const REELS = {
   autumn:   {t:'Birthday cake in the making', ig:null, tt:'7682404350261562646'},
   hands:    {t:'Original Brookie', ig:'DdO9bEjg7Kb', tt:'7684231554696252674'},
   showcase: {t:'Το original Brookie', ig:null, tt:'7691656444575304982'},
+  cinematic:{t:'Cinematic Brookie', ig:'DeZz0-Xgzbj', tt:null},
   vasilis:  {t:'Ο μικρός έπιασε δουλειά', ig:'DdT_742AJ7G', tt:'7685716657892805910'},
   candybar: {t:'Candy bars & events', ig:null, tt:'7687962389383236886'},
   team:     {t:'Η ομάδα μας', ig:null, tt:'7687639170822671618'},
