@@ -139,7 +139,7 @@ function catalogue(DB) {
     const run = () => { const term = norm(q.value.trim());
       if (!term) { res.hidden = true; shelves.hidden = false; cnt.hidden = true; return; }
       res.hidden = false; shelves.hidden = true; cnt.hidden = false;
-      listing(P.filter(p => norm(p.n + ' ' + p.s + ' ' + p.alt).includes(term)), grid, cnt, more); };
+      listing(P.filter(p => norm(p.n + ' ' + p.s + ' ' + p.alt + ' ' + (p.code || '') + ' ' + (p.oc || '')).includes(term)), grid, cnt, more); };
     let tm; q.oninput = () => { clearTimeout(tm); tm = setTimeout(run, 160); };
     run();
   }
@@ -172,14 +172,14 @@ function catalogue(DB) {
       $('#pName').textContent = p.n; $('#pMedia').innerHTML = `<div class="atl" role="img" aria-label="${esc(p.alt || p.n)}" style="${atl(p.t)}"></div>`;
       $('#pCat').textContent = label(c0) || 'Προϊόντα';
       $('#pDesc').innerHTML = p.d ? p.d.split(/\n+/).filter(Boolean).map(x => x.startsWith('<em>') ? `<p class="tagline">${x}</p>` : x.startsWith('<') ? x : `<p>${x}</p>`).join('') : `<p>Ρωτήστε μας για γεύσεις, μεγέθη και διαθεσιμότητα.</p>`;
-      $('#pFacts').innerHTML = `<dt>Κατηγορία</dt><dd>${p.c.filter(k => cats[k] && k !== 'proionta').map(k => `<a href="katigoria.html#${k}">${esc(label(k))}</a>`).join(', ')}</dd><dt>Κωδικός</dt><dd>${esc(p.s.toUpperCase().slice(0, 40))}</dd><dt>Παραγγελία</dt><dd>Με μήνυμα στο Instagram ή στο τηλέφωνο</dd>`;
+      $('#pFacts').innerHTML = `<dt>Κατηγορία</dt><dd>${p.c.filter(k => cats[k] && k !== 'proionta').map(k => `<a href="katigoria.html#${k}">${esc(label(k))}</a>`).join(', ')}</dd><dt>Κωδικός</dt><dd>${esc(p.code || '')}${p.oc ? ` <small class="muted">(παλιός: ${esc(p.oc)})</small>` : ''}</dd><dt>Παραγγελία</dt><dd>Με μήνυμα στο Instagram ή στο τηλέφωνο</dd>`;
       $('#crumbs').innerHTML = `<a href="index.html">Αρχική</a> <span aria-hidden="true">/</span> <a href="proionta.html">Προϊόντα</a> <span aria-hidden="true">/</span> ${c && c.parentKey && c.parentKey !== 'proionta' ? `<a href="katigoria.html#${c.parentKey}">${esc(label(c.parentKey))}</a> <span aria-hidden="true">/</span> ` : ''}<a href="katigoria.html#${c0}">${esc(label(c0))}</a>`;
       const sibs = inCat(c0); const i = sibs.findIndex(x => x.id === p.id); const prev = sibs[(i - 1 + sibs.length) % sibs.length], next = sibs[(i + 1) % sibs.length];
       $('#pNav').innerHTML = `<a href="proion.html#p${prev.id}">← ${esc(prev.n)}</a><a href="proion.html#p${next.id}" style="text-align:right">${esc(next.n)} →</a>`;
       const rel = sibs.filter(x => x.id !== p.id); const start = Math.max(0, i); $('#related').innerHTML = rel.slice(start, start + 8).concat(rel.slice(0, Math.max(0, 8 - rel.slice(start).length))).slice(0, 8).map(card).join('');
       $('#relMore').href = `katigoria.html#${c0}`; $('#relMore').textContent = `Όλες οι ${label(c0)} (${sibs.length}) →`;
       $('#pOld').textContent = p.old;
-      const of = $('#orderForm'); if (of) { const isCake = p.c.some(k => anc(k).includes('tourtes')); of.hidden = !isCake; $('#ofProduct').value = `${p.n} (#${p.id})`; of.open = false; }
+      const of = $('#orderForm'); if (of) { const isCake = p.c.some(k => anc(k).includes('tourtes')); of.hidden = !isCake; $('#ofProduct').value = `${p.n} · ${p.code || '#' + p.id}`; of.open = false; }
       window.scrollTo(0, 0);
     };
     addEventListener('hashchange', draw); draw();

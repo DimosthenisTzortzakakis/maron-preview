@@ -760,3 +760,6 @@ button.card.celebvid{border:0;padding:0;background:none;font:inherit;color:inher
 a.celebph{text-decoration:none;color:inherit}
 .shelf.celeb .card{flex:0 0 auto}
 .shelf.celeb{grid-auto-columns:clamp(200px,24vw,320px)}
+/* client 2026-10-19: MARON wordmark letters closer (header) — mobile like desktop */
+.brand span{letter-spacing:.24em}
+@media (max-width:700px){.brand span{letter-spacing:.14em;font-size:15px}}
