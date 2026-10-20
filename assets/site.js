@@ -35,18 +35,28 @@ const ttUrl = r => r.tt ? `${TT}/video/${r.tt}` : TT;
 window.MARON = {REELS, igUrl, ttUrl, ICON, esc};
 
 function reelHTML(key) {
-  const r = REELS[key]; const main = r.ig ? igUrl(r) : ttUrl(r); const where = r.ig ? 'Instagram' : (r.tt ? 'TikTok' : 'Instagram');
-  return `<div class="reel">
-    <a class="cover" href="${main}" target="_blank" rel="noopener" aria-label="${esc(r.t)}, άνοιγμα στο ${where}"></a>
-    <video src="assets/vid/${key}.mp4" poster="assets/vid/${key}.jpg" muted loop playsinline preload="none" data-auto aria-hidden="true"></video>
-    <span class="open">▶ ${where}</span>
-    <span class="plats">
-      <a href="${igUrl(r)}" target="_blank" rel="noopener" aria-label="Instagram">${ICON.ig}</a>
-      <a href="${ttUrl(r)}" target="_blank" rel="noopener" aria-label="TikTok">${ICON.tt}</a>
-    </span>
-    <span class="cap">${esc(r.t)}</span></div>`;
+  const r = REELS[key]; return reelItem({src: `assets/vid/${key}.mp4`, poster: `assets/vid/${key}.jpg`, t: r.t, ig: r.ig ? igUrl(r) : IG, tt: ttUrl(r)});
 }
-$$('[data-reels]').forEach(el => { el.innerHTML = el.dataset.reels.split(',').map(reelHTML).join(''); });
+function reelItem(o) {
+  return `<div class="reel">
+    <button type="button" class="cover" data-play="${esc(o.src)}" data-poster="${esc(o.poster)}" data-t="${esc(o.t)}" data-ig="${esc(o.ig)}" data-tt="${esc(o.tt)}" aria-label="${esc(o.t)}, αναπαραγωγή"></button>
+    <video src="${o.src}" poster="${o.poster}" muted loop playsinline preload="none" data-auto aria-hidden="true"></video>
+    <span class="open">▶ Play</span>
+    <span class="plats">
+      <a href="${o.ig}" target="_blank" rel="noopener" aria-label="Instagram">${ICON.ig}</a>
+      <a href="${o.tt}" target="_blank" rel="noopener" aria-label="TikTok">${ICON.tt}</a>
+    </span>
+    <span class="cap">${esc(o.t)}</span></div>`;
+}
+$$('[data-reels]').forEach(el => {
+  el.innerHTML = el.dataset.reels.split(',').map(reelHTML).join('');
+  if (el.hasAttribute('data-auto-reels')) fetch(`assets/reels.json?v=${VER}`).then(r => r.ok ? r.json() : []).then(list => {
+    if (!list || list.length < 4) return;
+    el.innerHTML = list.map(x => reelItem({src: `assets/vid/tt/${x.tt}.mp4`, poster: `assets/vid/tt/${x.tt}.jpg`, t: x.t,
+      ig: x.ig ? `https://www.instagram.com/reel/${x.ig}/` : IG, tt: `${TT}/video/${x.tt}`})).join('');
+    el.scrollLeft = 0; watch(el); el.dispatchEvent(new Event('scroll'));
+  }).catch(() => {});
+});
 $$('[data-vlinks]').forEach(el => { const r = REELS[el.dataset.vlinks]; if (!r) return;
   el.innerHTML = `<a href="${igUrl(r)}" target="_blank" rel="noopener" aria-label="Δείτε στο Instagram">${ICON.ig}</a><a href="${ttUrl(r)}" target="_blank" rel="noopener" aria-label="Δείτε στο TikTok">${ICON.tt}</a>`; });
 
@@ -62,7 +72,7 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-sound]'); if (!b) return;
   const v = b.parentElement.querySelector('video'); const turnOn = v.muted;
   $$('[data-sound]').forEach(o => { const ov = o.parentElement.querySelector('video'); if (ov !== v) { ov.muted = true; delete ov.dataset.keep; o.setAttribute('aria-pressed', 'false'); o.lastChild.textContent = 'Ήχος'; } });
-  v.muted = !turnOn; if (turnOn) { v.currentTime = 0; v.dataset.keep = '1'; v.play().catch(() => {}); } else delete v.dataset.keep;
+  v.muted = !turnOn; if (turnOn) { v.dataset.keep = '1'; if (v.paused) v.play().catch(() => {}); } else delete v.dataset.keep;   // keeps playing where it is
   b.setAttribute('aria-pressed', String(turnOn)); b.lastChild.textContent = turnOn ? 'Σίγαση' : 'Ήχος';
 });
 
@@ -73,9 +83,6 @@ if (hv) {
   const pick = () => { const src = 'assets/vid/hero.mp4';  // same calm shop film on mobile (the reel montage was too busy)
     if (!hv.src.endsWith(src)) { hv.poster = 'assets/vid/hero.jpg'; hv.src = src; if (!reduce) hv.play().catch(() => {}); } };
   pick(); mq.addEventListener?.('change', pick); if (reduce) hv.pause();
-  const hc = $('#heroCtl'), P = '<svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" fill="currentColor"/><rect x="14" y="5" width="4" height="14" fill="currentColor"/></svg>', Y = '<svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z" fill="currentColor"/></svg>';
-  const sync = () => { hc.innerHTML = hv.paused ? Y : P; hc.setAttribute('aria-label', hv.paused ? 'Αναπαραγωγή βίντεο' : 'Παύση βίντεο'); };
-  hc.onclick = () => hv.paused ? hv.play() : hv.pause(); hv.addEventListener('play', sync); hv.addEventListener('pause', sync); sync();
 }
 
 /* ---------- home: signature tabs — real products (rendered once the catalogue is loaded) ---------- */
@@ -324,31 +331,53 @@ if (seasonMeta) {
   $$('.letter').forEach(l => l.addEventListener('click', () => l.classList.toggle('open')));
 }
 
-/* ---------- hot item modal: photo + optional video ---------- */
-document.addEventListener('click', e => {
-  const b = e.target.closest('.hotvid'); if (!b) return;
-  const k = b.dataset.v, r = REELS[k] || {};
+/* ---------- one video player for the whole site: full vertical frame (never cropped), plays with sound,
+   mute / unmute bottom-left like the page videos — toggling never restarts the clip ---------- */
+const SND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+function modal() {
   let m = $('#vmodal'); if (!m) { document.body.insertAdjacentHTML('beforeend', '<div class="vmodal" id="vmodal" hidden role="dialog" aria-modal="true"><div class="vbox"><button class="vclose" type="button" aria-label="Κλείσιμο">×</button><div class="vmedia"></div><div class="vtx"></div></div></div>'); m = $('#vmodal'); }
   const media = $('.vmedia', m);
+  const close = () => { m.classList.remove('open'); $$('video', media).forEach(v => v.pause()); setTimeout(() => { m.hidden = true; media.innerHTML = ''; media.classList.remove('isvid'); }, 300); };
+  $('.vclose', m).onclick = close; m.onclick = ev => { if (ev.target === m) close(); };
+  const esc_ = ev => { if (ev.key === 'Escape') { close(); removeEventListener('keydown', esc_); } }; addEventListener('keydown', esc_);
+  const show = () => { m.hidden = false; requestAnimationFrame(() => m.classList.add('open')); };
+  return {m, media, show};
+}
+function playIn(media, src, poster) {
+  // pause the page's own loops so only one sound plays
+  $$('video').forEach(v => { if (!media.contains(v) && !v.muted) { v.muted = true; delete v.dataset.keep; } });
+  media.classList.add('isvid');
+  media.innerHTML = `<figure class="vplayer"><video src="${src}" poster="${poster}" autoplay loop playsinline></video>
+    <button class="sound on" type="button" data-psound aria-pressed="true">${SND}<span>Σίγαση</span></button></figure>`;
+  const v = $('video', media), b = $('[data-psound]', media);
+  v.play().catch(() => { v.muted = true; v.play().catch(() => {}); sync(); });
+  const sync = () => { b.setAttribute('aria-pressed', String(!v.muted)); b.classList.toggle('on', !v.muted); b.lastChild.textContent = v.muted ? 'Ήχος' : 'Σίγαση'; };
+  b.onclick = () => { v.muted = !v.muted; if (v.paused) v.play().catch(() => {}); sync(); };   // same position, no restart
+  v.onclick = () => v.paused ? v.play() : v.pause();
+}
+const vbtns = links => `<div class="vbtns">${links.map(l => `<a class="darkbtn line" href="${l[0]}" target="_blank" rel="noopener">${l[1]} ↗</a>`).join('')}</div>`;
+
+/* hot items: photo first, the reel on demand */
+document.addEventListener('click', e => {
+  const b = e.target.closest('.hotvid'); if (!b) return;
+  const k = b.dataset.v, r = REELS[k] || {}, {m, media, show} = modal();
   media.innerHTML = `<img src="${b.dataset.img}" onerror="this.onerror=null;this.src='assets/vid/${k}.jpg'" alt="">`;
   $('.vtx', m).innerHTML = `<h3>${esc(b.dataset.n)}</h3><div class="vbtns"><button class="darkbtn" type="button" id="vplay">▶ Δείτε το βίντεο</button><a class="darkbtn line" href="${r.ig ? igUrl(r) : ttUrl(r)}" target="_blank" rel="noopener">${r.ig ? 'Instagram' : 'TikTok'} ↗</a></div>`;
-  m.hidden = false; requestAnimationFrame(() => m.classList.add('open'));
-  $('#vplay').onclick = () => { media.innerHTML = `<video src="assets/vid/${k}.mp4" poster="assets/vid/${k}.jpg" controls autoplay playsinline></video>`; };
-  const close = () => { m.classList.remove('open'); setTimeout(() => { m.hidden = true; media.innerHTML = ''; }, 300); };
-  $('.vclose', m).onclick = close; m.onclick = ev => { if (ev.target === m) close(); };
-  document.addEventListener('keydown', function esc_(ev) { if (ev.key === 'Escape') { close(); document.removeEventListener('keydown', esc_); } });
+  show(); $('#vplay').onclick = () => playIn(media, `assets/vid/${k}.mp4`, `assets/vid/${k}.jpg`);
 });
-
-/* ---------- celebrity cakes: full reel with sound on demand ---------- */
+/* celebrity cakes */
 document.addEventListener('click', e => {
   const b = e.target.closest('.celebvid'); if (!b) return;
-  let m = $('#vmodal'); if (!m) { document.body.insertAdjacentHTML('beforeend', '<div class="vmodal" id="vmodal" hidden role="dialog" aria-modal="true"><div class="vbox"><button class="vclose" type="button" aria-label="Κλείσιμο">×</button><div class="vmedia"></div><div class="vtx"></div></div></div>'); m = $('#vmodal'); }
-  const media = $('.vmedia', m), k = b.dataset.k;
-  media.innerHTML = `<video src="assets/vid/${k}.mp4" poster="assets/vid/${k}.jpg" controls autoplay playsinline></video>`;
-  $('.vtx', m).innerHTML = `<p class="label">Τούρτες διασήμων</p><h3>${esc(b.dataset.n)}</h3><div class="vbtns"><a class="darkbtn line" href="${b.dataset.link}" target="_blank" rel="noopener">${esc(b.dataset.where)} ↗</a></div>`;
-  m.hidden = false; requestAnimationFrame(() => m.classList.add('open'));
-  const close = () => { m.classList.remove('open'); setTimeout(() => { m.hidden = true; media.innerHTML = ''; }, 300); };
-  $('.vclose', m).onclick = close; m.onclick = ev => { if (ev.target === m) close(); };
+  const {m, media, show} = modal(), k = b.dataset.k;
+  $('.vtx', m).innerHTML = `<p class="label">Τούρτες διασήμων</p><h3>${esc(b.dataset.n)}</h3>${vbtns([[b.dataset.link, esc(b.dataset.where)]])}`;
+  show(); playIn(media, `assets/vid/${k}.mp4`, `assets/vid/${k}.jpg`);
+});
+/* Maron on screen reels */
+document.addEventListener('click', e => {
+  const b = e.target.closest('.reel .cover[data-play]'); if (!b || b.closest('.dragging')) return;
+  const {m, media, show} = modal();
+  $('.vtx', m).innerHTML = `<p class="label">Maron on screen</p><h3>${esc(b.dataset.t)}</h3>${vbtns([[b.dataset.ig, 'Instagram'], [b.dataset.tt, 'TikTok']])}`;
+  show(); playIn(media, b.dataset.play, b.dataset.poster);
 });
 /* ---------- forms (prototype: no backend yet) ---------- */
 $$('form.f').forEach(f => f.addEventListener('submit', e => { e.preventDefault(); const ok = f.querySelector('.ok') || f.appendChild(Object.assign(document.createElement('p'), {className: 'ok full'}));

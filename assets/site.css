@@ -768,3 +768,35 @@ a.celebph{text-decoration:none;color:inherit}
 .hero h1.brandline .hl{letter-spacing:0;flex:0 0 auto;padding:0;margin:0;display:inline-block}
 @media (max-width:700px){.hero h1.brandline{gap:.035em;font-size:13vw!important}}
 @media (max-width:700px){.hero h1.brandline{font-size:17vw!important;gap:.05em}.hero #heroEyebrow{letter-spacing:.16em;font-size:10px}}
+/* client 2026-10-20: one video player everywhere — whole vertical frame, sound toggle bottom-left, no restart */
+.reel>.cover{position:absolute;inset:0;z-index:1;border:0;padding:0;margin:0;background:transparent;cursor:pointer}
+.vbox:has(.vmedia.isvid){grid-template-columns:auto minmax(240px,320px);width:auto;max-width:100%}
+.vmedia.isvid{aspect-ratio:9/16;height:min(calc(100svh - 40px),860px);max-height:none;background:#000}
+.vplayer{position:relative;margin:0;width:100%;height:100%}
+.vplayer video{width:100%;height:100%;object-fit:contain;background:#000;display:block;cursor:pointer}
+.vplayer .sound{left:12px;bottom:12px}
+.sound.on{background:var(--caramel);color:#fff}
+@media (max-width:700px){
+  .vmodal:has(.isvid){padding:10px}
+  .vbox:has(.vmedia.isvid){grid-template-columns:minmax(0,1fr);width:auto;max-height:calc(100svh - 20px);overflow:auto}
+  .vmedia.isvid{height:min(76svh,calc((100vw - 20px) * 16 / 9));width:auto;justify-self:center}
+  .vbox:has(.vmedia.isvid) .vtx{padding:12px 16px 16px;gap:10px}
+  .vbox:has(.vmedia.isvid) .vtx h3{font-size:20px}
+  .vbox:has(.vmedia.isvid) .vtx .label{display:none}
+}
+.vcard{aspect-ratio:9/16;width:min(100%,420px)}          /* page videos show the full vertical frame */
+/* Maron on screen: the two profiles + latest reels */
+.profiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 30px}
+.prof{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--filmfg) 18%,transparent);color:var(--filmfg);text-decoration:none;transition:background .3s,border-color .3s}
+.prof:hover{background:color-mix(in srgb,var(--filmfg) 6%,transparent);border-color:color-mix(in srgb,var(--filmfg) 35%,transparent)}
+.pav{width:58px;height:58px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#A8A66F,#D39A63,#A8A66F);flex:0 0 auto}
+.pav img{width:100%;height:100%;border-radius:50%;display:block;border:2px solid var(--filmbg)}
+.pmeta{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.pmeta b{font-weight:500;font-size:15px;letter-spacing:.01em}
+.pmeta small{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.24em;text-transform:uppercase;opacity:.7}
+.pmeta small i{display:inline-flex}.pmeta small i svg{width:13px;height:13px}
+.pmeta em{font-style:normal;font-size:12.5px;opacity:.7}
+.pbtn{flex:0 0 auto;padding:9px 16px;border-radius:999px;background:var(--filmfg);color:var(--filmbg);font-size:10px;letter-spacing:.22em;text-transform:uppercase}
+.film .latest{display:flex;align-items:center;gap:9px;margin:0 0 14px}
+.latest .dot{width:7px;height:7px;border-radius:50%;background:#E0483E;animation:pulse 1.8s infinite}
+@media (max-width:700px){.profiles{grid-template-columns:minmax(0,1fr);gap:10px}.prof{padding:12px}.pav{width:48px;height:48px}}
