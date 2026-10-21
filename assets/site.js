@@ -102,7 +102,7 @@ function renderSig(card, byId) {
 
 /* ---------- catalogue (products / category / product pages) ---------- */
 const page = document.body.dataset.page;
-if (['catalogue', 'category', 'product'].includes(page) || $('#homeHot')) {
+if (['catalogue', 'category', 'product'].includes(page) || $('#homeHot') || $('[data-evcat]')) {
   fetch(`assets/products.json?v=${VER}`).then(r => r.json()).then(DB => catalogue(DB)).catch(err => { const m = $('main'); m && m.insertAdjacentHTML('beforeend', `<p class="empty wrap">Δεν φορτώθηκε ο κατάλογος (${esc(err.message)}).</p>`); });
 }
 function catalogue(DB) {
@@ -119,6 +119,7 @@ function catalogue(DB) {
   const rows = Math.ceil(A.per / A.cols);
   const atl = t => { if (t == null) return 'background:var(--sand)'; const a = Math.floor(t / A.per), j = t % A.per, cx = j % A.cols, cy = Math.floor(j / A.cols);
     return `background-image:url(assets/atlas/a${String(a).padStart(2, '0')}.webp?v=${VER});background-size:${A.cols * 100}% ${rows * 100}%;background-position:${cx / (A.cols - 1) * 100}% ${cy / (rows - 1) * 100}%`; };
+  $$('[data-evcat]').forEach(el => { const p = P.filter(x => x.all.includes(el.dataset.evcat)).find(x => x.r) || P.find(x => x.all.includes(el.dataset.evcat)); if (p) el.setAttribute('style', atl(p.t)); });   // events add-ons
   const card = p => `<a class="card" href="proion.html#p${p.id}"><div class="ph"><div class="atl" role="img" aria-label="${esc(p.n)}" style="${atl(p.t)}"></div></div><div class="cap">${esc(p.n)}<small>${esc(cats[p.c[0]]?.name || '')}</small></div></a>`;
   const label = k => k === 'glyka-tourtes' ? 'Τούρτες (γλυκά)' : k === 'pagoto-tourtes' ? 'Τούρτες παγωτό' : cats[k]?.name;
 
@@ -147,8 +148,9 @@ function catalogue(DB) {
     const run = () => { const term = norm(q.value.trim());
       if (!term) { res.hidden = true; shelves.hidden = false; cnt.hidden = true; return; }
       res.hidden = false; shelves.hidden = true; cnt.hidden = false;
-      listing(P.filter(p => norm(p.n + ' ' + p.s + ' ' + p.alt + ' ' + (p.code || '') + ' ' + (p.oc || '')).includes(term)), grid, cnt, more); };
+      listing(P.filter(p => { const hay = norm(p.n + ' ' + p.s + ' ' + p.alt + ' ' + (p.sub || '') + ' ' + p.all.map(label).join(' ') + ' ' + (p.code || '') + ' ' + (p.oc || '')); return q.value.trim().split(/\s+/).map(norm).every(w => hay.includes(w)); }), grid, cnt, more); };
     let tm; q.oninput = () => { clearTimeout(tm); tm = setTimeout(run, 160); };
+    const qp = new URLSearchParams(location.search).get('q'); if (qp) { q.value = qp; q.scrollIntoView({block: 'center'}); }   // header search
     run();
   }
   if (page === 'category') {
@@ -383,6 +385,16 @@ document.addEventListener('click', e => {
 $$('form.f').forEach(f => f.addEventListener('submit', e => { e.preventDefault(); const ok = f.querySelector('.ok') || f.appendChild(Object.assign(document.createElement('p'), {className: 'ok full'}));
   ok.textContent = 'Το draft δεν στέλνει ακόμα: στο WordPress η φόρμα θα πηγαίνει στο info@maron-glykos.gr.'; }));
 
+/* ---------- events: "Ενδιαφέρομαι" / "+ Στη φόρμα" tick the option and bring the form into view ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-pick]'); if (!b) return;
+  const box = $$('#eventForm input[name="type"]').find(i => i.value === b.dataset.pick); if (!box) return;
+  box.checked = true; box.closest('label')?.classList.add('picked');
+  if (b.classList.contains('evadd')) { b.textContent = '✓ Στη φόρμα'; b.classList.add('on'); return; }
+  $('#evform').scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'start'});
+});
+/* ---------- header search (icon opens the field on narrow screens) ---------- */
+$$('.hsbtn').forEach(b => b.onclick = () => { const h = $('header.top'), o = h.classList.toggle('sopen'); if (o) setTimeout(() => $('.hsearch input', h)?.focus(), 30); });
 /* ---------- menu ---------- */
 const header = $('header.top'), mb = $('#menuBtn');
 mb && (mb.onclick = () => { const o = header.classList.toggle('open'); mb.setAttribute('aria-expanded', o); });
