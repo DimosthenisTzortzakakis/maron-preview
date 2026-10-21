@@ -148,7 +148,7 @@ function catalogue(DB) {
     const run = () => { const term = norm(q.value.trim());
       if (!term) { res.hidden = true; shelves.hidden = false; cnt.hidden = true; return; }
       res.hidden = false; shelves.hidden = true; cnt.hidden = false;
-      listing(P.filter(p => { const hay = norm(p.n + ' ' + p.s + ' ' + p.alt + ' ' + (p.sub || '') + ' ' + p.all.map(label).join(' ') + ' ' + (p.code || '') + ' ' + (p.oc || '')); return q.value.trim().split(/\s+/).map(norm).every(w => hay.includes(w)); }), grid, cnt, more); };
+      listing(P.filter(p => { const hay = norm(p.n + ' ' + p.s + ' ' + p.alt + ' ' + (p.sub || '') + ' ' + p.all.map(label).join(' ') + ' ' + (p.code || '')); return q.value.trim().split(/\s+/).map(norm).every(w => hay.includes(w)); }), grid, cnt, more); };
     let tm; q.oninput = () => { clearTimeout(tm); tm = setTimeout(run, 160); };
     const qp = new URLSearchParams(location.search).get('q'); if (qp) { q.value = qp; q.scrollIntoView({block: 'center'}); }   // header search
     run();
@@ -179,17 +179,18 @@ function catalogue(DB) {
       const id = +(location.hash.match(/^#p(\d+)$/) || [])[1]; const p = byId[id] || P[0];
       const c0 = p.c.find(k => cats[k] && k !== 'proionta') || p.c[0]; const c = cats[c0];
       document.title = `${p.n} · MARON Patisserie Gelateria`;
-      $('#pName').textContent = p.n; $('#pMedia').innerHTML = `<div class="atl" role="img" aria-label="${esc(p.alt || p.n)}" style="${atl(p.t)}"></div>`;
+      $('#pName').textContent = p.n; $('#pName').nextElementSibling?.classList.contains('pcode') && $('#pName').nextElementSibling.remove();
+      if (p.code) $('#pName').insertAdjacentHTML('afterend', `<p class="pcode">Κωδ. ${esc(p.code)}</p>`); $('#pMedia').innerHTML = `<div class="atl" role="img" aria-label="${esc(p.alt || p.n)}" style="${atl(p.t)}"></div>`;
       $('#pCat').textContent = label(c0) || 'Προϊόντα';
       $('#pDesc').innerHTML = p.d ? p.d.split(/\n+/).filter(Boolean).map(x => x.startsWith('<em>') ? `<p class="tagline">${x}</p>` : x.startsWith('<') ? x : `<p>${x}</p>`).join('') : `<p>Ρωτήστε μας για γεύσεις, μεγέθη και διαθεσιμότητα.</p>`;
-      $('#pFacts').innerHTML = `<dt>Κατηγορία</dt><dd>${p.c.filter(k => cats[k] && k !== 'proionta').map(k => `<a href="katigoria.html#${k}">${esc(label(k))}</a>`).join(', ')}</dd><dt>Κωδικός</dt><dd>${esc(p.code || '')}${p.oc ? ` <small class="muted">(παλιός: ${esc(p.oc)})</small>` : ''}</dd><dt>Παραγγελία</dt><dd>Με μήνυμα στο Instagram ή στο τηλέφωνο</dd>`;
+      $('#pFacts').innerHTML = `<dt>Κατηγορία</dt><dd>${p.c.filter(k => cats[k] && k !== 'proionta').map(k => `<a href="katigoria.html#${k}">${esc(label(k))}</a>`).join(', ')}</dd><dt>Παραγγελία</dt><dd>Με μήνυμα στο Instagram ή στο τηλέφωνο</dd>`;
       $('#crumbs').innerHTML = `<a href="index.html">Αρχική</a> <span aria-hidden="true">/</span> <a href="proionta.html">Προϊόντα</a> <span aria-hidden="true">/</span> ${c && c.parentKey && c.parentKey !== 'proionta' ? `<a href="katigoria.html#${c.parentKey}">${esc(label(c.parentKey))}</a> <span aria-hidden="true">/</span> ` : ''}<a href="katigoria.html#${c0}">${esc(label(c0))}</a>`;
       const sibs = inCat(c0); const i = sibs.findIndex(x => x.id === p.id); const prev = sibs[(i - 1 + sibs.length) % sibs.length], next = sibs[(i + 1) % sibs.length];
       $('#pNav').innerHTML = `<a href="proion.html#p${prev.id}">← ${esc(prev.n)}</a><a href="proion.html#p${next.id}" style="text-align:right">${esc(next.n)} →</a>`;
       const rel = sibs.filter(x => x.id !== p.id); const start = Math.max(0, i); $('#related').innerHTML = rel.slice(start, start + 8).concat(rel.slice(0, Math.max(0, 8 - rel.slice(start).length))).slice(0, 8).map(card).join('');
       $('#relMore').href = `katigoria.html#${c0}`; $('#relMore').textContent = `Όλες οι ${label(c0)} (${sibs.length}) →`;
       $('#pOld').textContent = p.old; const ow = $('#pOldWrap'); if (ow) ow.hidden = !p.old;
-      const of = $('#orderForm'); if (of) { const isCake = p.c.some(k => anc(k).includes('tourtes')); of.hidden = !isCake; $('#ofProduct').value = `${p.n} · ${p.code || '#' + p.id}`; of.open = false; }
+      const of = $('#orderForm'); if (of) { const isCake = p.c.some(k => anc(k).includes('tourtes')); of.hidden = !isCake; $('#ofProduct').value = p.code ? `${p.n} · ${p.code}` : p.n; of.open = false; }
       window.scrollTo(0, 0);
     };
     addEventListener('hashchange', draw); draw();
@@ -385,27 +386,10 @@ document.addEventListener('click', e => {
 $$('form.f').forEach(f => f.addEventListener('submit', e => { e.preventDefault(); const ok = f.querySelector('.ok') || f.appendChild(Object.assign(document.createElement('p'), {className: 'ok full'}));
   ok.textContent = 'Το draft δεν στέλνει ακόμα: στο WordPress η φόρμα θα πηγαίνει στο info@maron-glykos.gr.'; }));
 
-/* ---------- events: tiles on the left are tap-to-select; the form on the right lists what was picked ---------- */
+/* ---------- events form: «Διοργάνωση event» from a category page arrives with ?type=… ticked ---------- */
 if ($('#eventForm')) {
-  const boxes = () => $$('#eventForm input[name="type"]'), sel = $('#evSel');
-  const sync = () => {
-    const tiles = $$('[data-pick][aria-pressed="true"]');
-    const vals = new Set(tiles.map(t => t.dataset.pick));
-    boxes().forEach(i => { if (i.dataset.auto === '1' && !vals.has(i.value)) { i.checked = false; delete i.dataset.auto; }
-      if (vals.has(i.value) && !i.checked) { i.checked = true; i.dataset.auto = '1'; } });
-    const names = [...new Set([...tiles.map(t => t.dataset.label || t.querySelector('b').textContent),
-      ...boxes().filter(i => i.checked && !i.dataset.auto).map(i => i.value)])];
-    sel.innerHTML = names.length ? `<span class="muted">Επιλέξατε:</span> ${names.map(n => `<span class="chip on">${esc(n)}</span>`).join('')}` : '<span class="muted">Δεν έχετε επιλέξει ακόμα. Πατήστε στις επιλογές αριστερά.</span>';
-    let ex = $('#eventForm input[name="extras"]'); if (!ex) { ex = Object.assign(document.createElement('input'), {type: 'hidden', name: 'extras'}); $('#eventForm').append(ex); }
-    ex.value = names.join(', ');
-    const fab = $('#evFab'); if (fab) { fab.hidden = !names.length; fab.querySelector('b').textContent = names.length; }
-  };
-  document.addEventListener('click', e => { const t = e.target.closest('[data-pick]'); if (!t) return;
-    t.setAttribute('aria-pressed', String(t.getAttribute('aria-pressed') !== 'true')); sync(); });
-  $('#eventForm').addEventListener('change', e => { if (e.target.name === 'type') { delete e.target.dataset.auto;
-    if (!e.target.checked) $$(`[data-pick="${CSS.escape(e.target.value)}"]`).forEach(t => t.setAttribute('aria-pressed', 'false')); sync(); } });
-  document.body.insertAdjacentHTML('beforeend', '<a class="evfab" id="evFab" href="#evform" hidden>Στη φόρμα · <b>0</b> ↓</a>');
-  sync();
+  const t = new URLSearchParams(location.search).get('type');
+  if (t) $$('#eventForm input[name="type"]').forEach(i => { if (i.value === t) i.checked = true; });
 }
 /* ---------- header search (icon opens the field on narrow screens) ---------- */
 $$('.hsbtn').forEach(b => b.onclick = () => { const h = $('header.top'), o = h.classList.toggle('sopen'); if (o) setTimeout(() => $('.hsearch input', h)?.focus(), 30); });
