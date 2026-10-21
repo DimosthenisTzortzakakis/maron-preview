@@ -188,7 +188,7 @@ function catalogue(DB) {
       $('#pNav').innerHTML = `<a href="proion.html#p${prev.id}">← ${esc(prev.n)}</a><a href="proion.html#p${next.id}" style="text-align:right">${esc(next.n)} →</a>`;
       const rel = sibs.filter(x => x.id !== p.id); const start = Math.max(0, i); $('#related').innerHTML = rel.slice(start, start + 8).concat(rel.slice(0, Math.max(0, 8 - rel.slice(start).length))).slice(0, 8).map(card).join('');
       $('#relMore').href = `katigoria.html#${c0}`; $('#relMore').textContent = `Όλες οι ${label(c0)} (${sibs.length}) →`;
-      $('#pOld').textContent = p.old;
+      $('#pOld').textContent = p.old; const ow = $('#pOldWrap'); if (ow) ow.hidden = !p.old;
       const of = $('#orderForm'); if (of) { const isCake = p.c.some(k => anc(k).includes('tourtes')); of.hidden = !isCake; $('#ofProduct').value = `${p.n} · ${p.code || '#' + p.id}`; of.open = false; }
       window.scrollTo(0, 0);
     };
@@ -385,14 +385,28 @@ document.addEventListener('click', e => {
 $$('form.f').forEach(f => f.addEventListener('submit', e => { e.preventDefault(); const ok = f.querySelector('.ok') || f.appendChild(Object.assign(document.createElement('p'), {className: 'ok full'}));
   ok.textContent = 'Το draft δεν στέλνει ακόμα: στο WordPress η φόρμα θα πηγαίνει στο info@maron-glykos.gr.'; }));
 
-/* ---------- events: "Ενδιαφέρομαι" / "+ Στη φόρμα" tick the option and bring the form into view ---------- */
-document.addEventListener('click', e => {
-  const b = e.target.closest('[data-pick]'); if (!b) return;
-  const box = $$('#eventForm input[name="type"]').find(i => i.value === b.dataset.pick); if (!box) return;
-  box.checked = true; box.closest('label')?.classList.add('picked');
-  if (b.classList.contains('evadd')) { b.textContent = '✓ Στη φόρμα'; b.classList.add('on'); return; }
-  $('#evform').scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'start'});
-});
+/* ---------- events: tiles on the left are tap-to-select; the form on the right lists what was picked ---------- */
+if ($('#eventForm')) {
+  const boxes = () => $$('#eventForm input[name="type"]'), sel = $('#evSel');
+  const sync = () => {
+    const tiles = $$('[data-pick][aria-pressed="true"]');
+    const vals = new Set(tiles.map(t => t.dataset.pick));
+    boxes().forEach(i => { if (i.dataset.auto === '1' && !vals.has(i.value)) { i.checked = false; delete i.dataset.auto; }
+      if (vals.has(i.value) && !i.checked) { i.checked = true; i.dataset.auto = '1'; } });
+    const names = [...new Set([...tiles.map(t => t.dataset.label || t.querySelector('b').textContent),
+      ...boxes().filter(i => i.checked && !i.dataset.auto).map(i => i.value)])];
+    sel.innerHTML = names.length ? `<span class="muted">Επιλέξατε:</span> ${names.map(n => `<span class="chip on">${esc(n)}</span>`).join('')}` : '<span class="muted">Δεν έχετε επιλέξει ακόμα. Πατήστε στις επιλογές αριστερά.</span>';
+    let ex = $('#eventForm input[name="extras"]'); if (!ex) { ex = Object.assign(document.createElement('input'), {type: 'hidden', name: 'extras'}); $('#eventForm').append(ex); }
+    ex.value = names.join(', ');
+    const fab = $('#evFab'); if (fab) { fab.hidden = !names.length; fab.querySelector('b').textContent = names.length; }
+  };
+  document.addEventListener('click', e => { const t = e.target.closest('[data-pick]'); if (!t) return;
+    t.setAttribute('aria-pressed', String(t.getAttribute('aria-pressed') !== 'true')); sync(); });
+  $('#eventForm').addEventListener('change', e => { if (e.target.name === 'type') { delete e.target.dataset.auto;
+    if (!e.target.checked) $$(`[data-pick="${CSS.escape(e.target.value)}"]`).forEach(t => t.setAttribute('aria-pressed', 'false')); sync(); } });
+  document.body.insertAdjacentHTML('beforeend', '<a class="evfab" id="evFab" href="#evform" hidden>Στη φόρμα · <b>0</b> ↓</a>');
+  sync();
+}
 /* ---------- header search (icon opens the field on narrow screens) ---------- */
 $$('.hsbtn').forEach(b => b.onclick = () => { const h = $('header.top'), o = h.classList.toggle('sopen'); if (o) setTimeout(() => $('.hsearch input', h)?.focus(), 30); });
 /* ---------- menu ---------- */
