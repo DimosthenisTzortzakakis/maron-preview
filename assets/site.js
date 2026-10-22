@@ -384,7 +384,7 @@ document.addEventListener('click', e => {
 });
 /* ---------- forms (prototype: no backend yet) ---------- */
 $$('form.f').forEach(f => f.addEventListener('submit', e => { e.preventDefault(); const ok = f.querySelector('.ok') || f.appendChild(Object.assign(document.createElement('p'), {className: 'ok full'}));
-  ok.textContent = 'Το draft δεν στέλνει ακόμα: στο WordPress η φόρμα θα πηγαίνει στο info@maron-glykos.gr.'; }));
+  ok.textContent = 'Το draft δεν στέλνει ακόμα: στο WordPress η φόρμα θα πηγαίνει στα info@maron-glykos.gr, maron1983@yahoo.com και glykoskyriakos9@gmail.com.'; }));
 
 /* ---------- events form: «Διοργάνωση event» from a category page arrives with ?type=… ticked ---------- */
 if ($('#eventForm')) {
