@@ -1,16 +1,15 @@
 /* MARON — shared design system (prototype → WordPress theme style.css) */
-:root{
-  --cream:#F1ECE6;--sand:#E6DCCF;--caramel:#9A6334;--terra:#A5502F;--cacao:#2B1D16;--muted:#7A6556;
-  --gold:#A8A66F;--card:#FBF8F4;--line:rgba(43,29,22,.14);--shadow:rgba(60,35,20,.12);
-  --filmbg:#2B1D16;--filmfg:#F1ECE6;
+:root{color-scheme:dark;   /* client 2026-10-24: the dark brown palette for everyone, whatever the device setting */
+  --cream:#1C1411;--sand:#2A1F19;--caramel:#D39A63;--terra:#D07A55;--cacao:#F1E7DC;--muted:#B5A08E;
+  --gold:#C9C68E;--card:#241A15;--line:rgba(241,231,220,.14);--shadow:rgba(0,0,0,.4);
+  --filmbg:#0F0A08;--filmfg:#F1E7DC;
   --gutter:clamp(16px,4vw,56px);--headh:68px;
   --sans:"Commissioner",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
-  --cream:#1C1411;--sand:#2A1F19;--caramel:#D39A63;--terra:#D07A55;--cacao:#F1E7DC;--muted:#B5A08E;--gold:#C9C68E;--card:#241A15;--line:rgba(241,231,220,.14);--shadow:rgba(0,0,0,.4);--filmbg:#0F0A08;--filmfg:#F1E7DC}}
-:root[data-theme="dark"]{color-scheme:dark;
-  --cream:#1C1411;--sand:#2A1F19;--caramel:#D39A63;--terra:#D07A55;--cacao:#F1E7DC;--muted:#B5A08E;--gold:#C9C68E;--card:#241A15;--line:rgba(241,231,220,.14);--shadow:rgba(0,0,0,.4);--filmbg:#0F0A08;--filmfg:#F1E7DC}
+:root[data-theme="light"]{color-scheme:light;
+  --cream:#F1ECE6;--sand:#E6DCCF;--caramel:#9A6334;--terra:#A5502F;--cacao:#2B1D16;--muted:#7A6556;
+  --gold:#A8A66F;--card:#FBF8F4;--line:rgba(43,29,22,.14);--shadow:rgba(60,35,20,.12);--filmbg:#2B1D16;--filmfg:#F1ECE6}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:120px}
 body{margin:0;background:var(--cream);color:var(--cacao);font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
