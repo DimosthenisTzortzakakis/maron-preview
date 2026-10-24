@@ -971,3 +971,9 @@ nav.main a.ml{letter-spacing:.2em;font-size:11px}
   .evpage{grid-template-columns:minmax(0,1fr)}.evpmedia{position:static}.evminis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.evhub{grid-template-columns:minmax(0,1fr)}.evhub.small{grid-template-columns:repeat(2,minmax(0,1fr))}
   .evpmedia img:not(:first-child){display:none}.evpmedia{grid-template-columns:1fr}}
+/* cookie consent */
+.cookiebar{position:fixed;z-index:120;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(720px,calc(100% - 24px));background:var(--card);color:var(--cacao);border:1px solid var(--line);box-shadow:0 18px 50px var(--shadow);padding:14px 16px;display:flex;gap:12px 18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.cookiebar p{margin:0;font-size:13.5px;line-height:1.5;flex:1 1 280px}.cookiebar p a{color:var(--caramel)}
+.cookiebar div{display:flex;gap:8px}.cookiebar .darkbtn{padding:10px 16px}
+@media (max-width:700px){.cookiebar{bottom:calc(74px + env(safe-area-inset-bottom,0px))}}
+.fpriv{font-size:12px;color:var(--muted);margin:4px 0 0}.fpriv a{color:inherit}

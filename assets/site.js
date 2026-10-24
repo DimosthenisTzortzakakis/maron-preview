@@ -1,6 +1,7 @@
 /* MARON — shared behaviour (prototype). In WordPress the catalogue pages become WooCommerce templates;
    this file keeps only the UI parts (video, reels, menus, filters). */
 (() => {
+const PAGE = n => n + '.html';
 const VER = ((document.currentScript && document.currentScript.src.split('?v=')[1]) || String(Date.now())).split('&')[0];
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -393,6 +394,22 @@ if ($('#eventForm')) {
 }
 /* ---------- header search (icon opens the field on narrow screens) ---------- */
 $$('.hsbtn').forEach(b => b.onclick = () => { const h = $('header.top'), o = h.classList.toggle('sopen'); if (o) setTimeout(() => $('.hsearch input', h)?.focus(), 30); });
+/* ---------- cookies: Google Analytics only after «Αποδοχή» (Consent Mode default = denied, set in the page head) ---------- */
+(() => {
+  const KEY = 'maron_consent', priv = (typeof PAGE === 'function') ? PAGE('privacy') : 'privacy.html';
+  const get = () => { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
+  const apply = v => { if (typeof window.gtag === 'function') window.gtag('consent', 'update', {analytics_storage: v === 'granted' ? 'granted' : 'denied'}); };
+  const show = () => {
+    if ($('#cookiebar')) return;
+    document.body.insertAdjacentHTML('beforeend', `<div class="cookiebar" id="cookiebar" role="dialog" aria-live="polite" aria-label="Cookies"><p>Χρησιμοποιούμε cookies για στατιστικά επισκεψιμότητας, μόνο αν τα αποδεχτείτε. <a href="${priv}">Πολιτική απορρήτου</a></p><div><button type="button" class="darkbtn line" data-c="denied">Απόρριψη</button><button type="button" class="darkbtn" data-c="granted">Αποδοχή</button></div></div>`);
+    $('#cookiebar').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if (!b) return; try { localStorage.setItem(KEY, b.dataset.c); } catch (err) {} apply(b.dataset.c); $('#cookiebar').remove(); });
+  };
+  const v = get(); if (v) apply(v); else setTimeout(show, 900);
+  document.addEventListener('click', e => { if (e.target.closest('[data-cookie-settings]')) { try { localStorage.removeItem(KEY); } catch (err) {} show(); } });
+  // a short privacy note under every form
+  $$('form.f').forEach(f => { if (!f.querySelector('.fpriv')) f.insertAdjacentHTML('beforeend', `<p class="fpriv full">Τα στοιχεία σας χρησιμοποιούνται μόνο για να απαντήσουμε στο αίτημά σας. <a href="${priv}">Πολιτική απορρήτου</a></p>`); });
+})();
+
 /* ---------- menu ---------- */
 const header = $('header.top'), mb = $('#menuBtn');
 mb && (mb.onclick = () => { const o = header.classList.toggle('open'); mb.setAttribute('aria-expanded', o); });
