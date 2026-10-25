@@ -124,10 +124,11 @@ function catalogue(DB) {
   const card = p => `<a class="card" href="proion.html#p${p.id}"><div class="ph"><div class="atl" role="img" aria-label="${esc(p.n)}" style="${atl(p.t)}"></div></div><div class="cap">${esc(p.n)}<small>${esc(cats[p.c[0]]?.name || '')}</small></div></a>`;
   const label = k => k === 'glyka-tourtes' ? 'Τούρτες (γλυκά)' : k === 'pagoto-tourtes' ? 'Τούρτες παγωτό' : cats[k]?.name;
 
-  function listing(list, gridEl, countEl, moreEl, step = 48) {
-    let shown = 0; const draw = () => { const next = list.slice(shown, shown + step); gridEl.insertAdjacentHTML('beforeend', next.map(card).join('')); shown += next.length;
+  function listing(list, gridEl, countEl, moreEl, step = 48, pre = 0) {   // pre: cards the server already printed (same order) -> keep them
+    let shown = pre; const draw = () => { const next = list.slice(shown, shown + step); gridEl.insertAdjacentHTML('beforeend', next.map(card).join('')); shown += next.length;
       moreEl.hidden = shown >= list.length; if (countEl) countEl.textContent = `${list.length} δημιουργίες`; };
-    gridEl.innerHTML = ''; draw(); moreEl.onclick = draw; if (!list.length) gridEl.innerHTML = '<p class="empty" style="grid-column:1/-1">Δεν βρέθηκαν δημιουργίες. Δοκιμάστε άλλη λέξη.</p>';
+    if (pre) { moreEl.hidden = shown >= list.length; if (countEl) countEl.textContent = `${list.length} δημιουργίες`; } else { gridEl.innerHTML = ''; draw(); }
+    moreEl.onclick = draw; if (!list.length) gridEl.innerHTML = '<p class="empty" style="grid-column:1/-1">Δεν βρέθηκαν δημιουργίες. Δοκιμάστε άλλη λέξη.</p>';
   }
   const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
@@ -182,10 +183,12 @@ function catalogue(DB) {
       $('#subchips').innerHTML = sib.filter(x => x && inCat(x.key).length).sort((x, y) => pos(x) - pos(y)).map(x => `<a class="chip" data-k="${x.key}" href="katigoria.html#${x.key}" ${x.key === k ? 'aria-current="page"' : ''}>${esc(x.key === c.parentKey ? 'Όλα' : (x.key === k && !c.parentKey ? 'Όλα' : label(x.key)))} <small>${inCat(x.key).length}</small></a>`).join('');
       const grouped = !!(window.CAT_GROUPS && CAT_GROUPS[k]);
       const q = $('#q'); q.value = '';
-      const ssr = first && G.dataset.ssr === k; first = false;   // WordPress already printed exactly this: keep it, no redraw
+      const ssr = first; first = false;   // first draw: keep what WordPress already printed for this category (data-ssr), no redraw
       const run = () => { const t = norm(q.value.trim());
         if (grouped && !t) { $('#grid').hidden = true; $('#more').hidden = true; G.hidden = false; $('#count').textContent = `${list.length} δημιουργίες`; if (!ssr || G.dataset.ssr !== k) G.innerHTML = groupsHTML(k, list); G.dataset.ssr = k; return; }
-        G.hidden = true; $('#grid').hidden = false; listing(t ? list.filter(p => norm(p.n + ' ' + p.s).includes(t)) : list, $('#grid'), $('#count'), $('#more')); };
+        G.hidden = true; $('#grid').hidden = false;
+        const keep = !t && ssr && $('#grid').dataset.ssr === k ? $('#grid').children.length : 0; $('#grid').dataset.ssr = '';
+        listing(t ? list.filter(p => norm(p.n + ' ' + p.s).includes(t)) : list, $('#grid'), $('#count'), $('#more'), 48, keep); };
       let tm; q.oninput = () => { clearTimeout(tm); tm = setTimeout(run, 160); }; run();
       $$('nav.main a.ml').forEach(a => a.toggleAttribute('aria-current', a.dataset.key && anc(k).includes(a.dataset.key)));
     };
