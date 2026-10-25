@@ -82,8 +82,9 @@ document.addEventListener('click', e => {
 const hv = $('#heroVid');
 if (hv) {
   const mq = matchMedia('(max-width:700px)');
-  const pick = () => { const src = 'assets/vid/hero.mp4';  // same calm shop film on mobile (the reel montage was too busy)
-    if (!hv.src.endsWith(src)) { hv.poster = 'assets/vid/hero.jpg'; hv.src = src; if (!reduce) hv.play().catch(() => {}); } };
+  // same calm shop film everywhere; phones get the vertical crop of it (1 MB instead of 4 MB)
+  const pick = () => { const k = mq.matches ? 'hero_p' : 'hero', src = VIDP + k + '.mp4';
+    if (!hv.src.endsWith(src)) { hv.poster = VIDP + k + '.webp'; hv.src = src; if (!reduce) hv.play().catch(() => {}); } };
   pick(); mq.addEventListener?.('change', pick); if (reduce) hv.pause();
 }
 
