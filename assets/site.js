@@ -155,8 +155,19 @@ function catalogue(DB) {
     run();
   }
   if (page === 'category') {
+    // parent categories (Τούρτες, Γλυκά …) show one row per sub-category in a fixed order (window.CAT_GROUPS); leaves and searches show the grid.
+    // Chips switch in place (history.pushState): no page reload, no flash.
+    const sec = $('#subchips').closest('section'), G = $('#catGroups');
+    let navK = null, first = true;
+    const groupsHTML = (k, list) => {
+      const ks = (window.CAT_GROUPS && CAT_GROUPS[k]) || []; const seen = new Set();
+      const row = (key, name, l) => `<div class="shelfrow"><div class="shelfhead"><h3>${esc(name)} <small>${l.length}</small></h3>${key ? `<a class="textlink" data-k="${key}" href="katigoria.html#${key}">Δείτε όλες →</a>` : ''}</div><div class="shelf">${l.slice(0, 12).map(card).join('')}</div></div>`;
+      const out = ks.map(g => { const l = inCat(g); l.forEach(p => seen.add(p.id)); return l.length ? row(g, label(g), l) : ''; });
+      const rest = list.filter(p => !seen.has(p.id)); if (rest.length) out.push(row('', 'Περισσότερες', rest));
+      return out.join('');
+    };
     const draw = () => {
-      const k = (location.hash.slice(1) || 'tourtes'); const c = cats[k];
+      const k = navK || (location.hash.slice(1) || 'tourtes'); const c = cats[k];
       if (!c) { $('#catTitle').textContent = 'Η κατηγορία δεν βρέθηκε'; return; }
       const list = inCat(k); document.title = `${(window.CAT_THEME && CAT_THEME[k] && CAT_THEME[k].title) || label(k)} · MARON Patisserie Gelateria`;
       $('#catTitle').textContent = label(k);
@@ -166,14 +177,23 @@ function catalogue(DB) {
       applyTheme(k, c);
       const parent = c.parentKey && cats[c.parentKey]; $('#crumbParent').innerHTML = parent && parent.key !== 'proionta' ? `<a href="katigoria.html#${parent.key}">${esc(label(parent.key))}</a> <span aria-hidden="true">/</span>` : '';
       const sib = c.parentKey && c.parentKey !== 'proionta' ? [cats[c.parentKey], ...kids(c.parentKey)] : [c, ...kids(k)];
-      $('#subchips').innerHTML = sib.filter(x => x && inCat(x.key).length).map(x => `<a class="chip" href="katigoria.html#${x.key}" ${x.key === k ? 'aria-current="page"' : ''}>${esc(x.key === c.parentKey ? 'Όλα' : (x.key === k && !c.parentKey ? 'Όλα' : label(x.key)))} <small>${inCat(x.key).length}</small></a>`).join('');
+      const order = (window.CAT_GROUPS && CAT_GROUPS[sib[0] && sib[0].key]) || [];
+      const pos = x => x === sib[0] ? -1 : (order.includes(x.key) ? order.indexOf(x.key) : 99);
+      $('#subchips').innerHTML = sib.filter(x => x && inCat(x.key).length).sort((x, y) => pos(x) - pos(y)).map(x => `<a class="chip" data-k="${x.key}" href="katigoria.html#${x.key}" ${x.key === k ? 'aria-current="page"' : ''}>${esc(x.key === c.parentKey ? 'Όλα' : (x.key === k && !c.parentKey ? 'Όλα' : label(x.key)))} <small>${inCat(x.key).length}</small></a>`).join('');
+      const grouped = !!(window.CAT_GROUPS && CAT_GROUPS[k]);
       const q = $('#q'); q.value = '';
-      const run = () => { const t = norm(q.value.trim()); listing(t ? list.filter(p => norm(p.n + ' ' + p.s).includes(t)) : list, $('#grid'), $('#count'), $('#more')); };
+      const ssr = first && G.dataset.ssr === k; first = false;   // WordPress already printed exactly this: keep it, no redraw
+      const run = () => { const t = norm(q.value.trim());
+        if (grouped && !t) { $('#grid').hidden = true; $('#more').hidden = true; G.hidden = false; $('#count').textContent = `${list.length} δημιουργίες`; if (!ssr || G.dataset.ssr !== k) G.innerHTML = groupsHTML(k, list); G.dataset.ssr = k; return; }
+        G.hidden = true; $('#grid').hidden = false; listing(t ? list.filter(p => norm(p.n + ' ' + p.s).includes(t)) : list, $('#grid'), $('#count'), $('#more')); };
       let tm; q.oninput = () => { clearTimeout(tm); tm = setTimeout(run, 160); }; run();
       $$('nav.main a.ml').forEach(a => a.toggleAttribute('aria-current', a.dataset.key && anc(k).includes(a.dataset.key)));
-      window.scrollTo(0, 0);
     };
-    addEventListener('hashchange', draw); draw();
+    sec.addEventListener('click', e => { const a = e.target.closest('a[data-k]'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault(); navK = a.dataset.k; history.pushState({k: navK}, '', a.href); draw();
+      const top = $('#subchips').getBoundingClientRect().top + scrollY - 110; if (scrollY > top) scrollTo({top, behavior: reduce ? 'auto' : 'smooth'}); });
+    addEventListener('popstate', e => { navK = (e.state && e.state.k) || null; draw(); });
+    addEventListener('hashchange', () => { navK = null; draw(); window.scrollTo(0, 0); }); draw();
   }
   if (page === 'product') {
     const draw = () => {

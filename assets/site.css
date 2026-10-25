@@ -976,3 +976,7 @@ nav.main a.ml{letter-spacing:.2em;font-size:11px}
 .cookiebar div{display:flex;gap:8px}.cookiebar .darkbtn{padding:10px 16px}
 @media (max-width:700px){.cookiebar{bottom:calc(74px + env(safe-area-inset-bottom,0px))}}
 .fpriv{font-size:12px;color:var(--muted);margin:4px 0 0}.fpriv a{color:inherit}
+
+/* category page: one row per sub-category (Τούρτες, Γλυκά …) */
+.catgroups{margin-top:clamp(18px,2.5vw,34px)}
+.catgroups .shelfrow:last-child{margin-bottom:0}
