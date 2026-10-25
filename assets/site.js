@@ -6,6 +6,7 @@ const VER = ((document.currentScript && document.currentScript.src.split('?v=')[
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const esc = s => String(s ?? '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const VIDP = 'assets/vid/';   // product / reel videos
 const IG = 'https://www.instagram.com/maron_greece/', TT = 'https://www.tiktok.com/@maron_greece';
 const ICON = {
   ig: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/></svg>',
@@ -121,7 +122,7 @@ function catalogue(DB) {
   const atl = t => { if (t == null) return 'background:var(--sand)'; const a = Math.floor(t / A.per), j = t % A.per, cx = j % A.cols, cy = Math.floor(j / A.cols);
     return `background-image:url(assets/atlas/a${String(a).padStart(2, '0')}.webp?v=${VER});background-size:${A.cols * 100}% ${rows * 100}%;background-position:${cx / (A.cols - 1) * 100}% ${cy / (rows - 1) * 100}%`; };
   $$('[data-evcat]').forEach(el => { const p = P.filter(x => x.all.includes(el.dataset.evcat)).find(x => x.r) || P.find(x => x.all.includes(el.dataset.evcat)); if (p) el.setAttribute('style', atl(p.t)); });   // events add-ons
-  const card = p => `<a class="card" href="proion.html#p${p.id}"><div class="ph"><div class="atl" role="img" aria-label="${esc(p.n)}" style="${atl(p.t)}"></div></div><div class="cap">${esc(p.n)}<small>${esc(cats[p.c[0]]?.name || '')}</small></div></a>`;
+  const card = p => `<a class="card" href="proion.html#p${p.id}"><div class="ph">${p.v && p.v.length ? '<span class="vbadge">▶ Βίντεο</span>' : ''}<div class="atl" role="img" aria-label="${esc(p.n)}" style="${atl(p.t)}"></div></div><div class="cap">${esc(p.n)}<small>${esc(cats[p.c[0]]?.name || '')}</small></div></a>`;
   const label = k => k === 'glyka-tourtes' ? 'Τούρτες (γλυκά)' : k === 'pagoto-tourtes' ? 'Τούρτες παγωτό' : cats[k]?.name;
 
   function listing(list, gridEl, countEl, moreEl, step = 48, pre = 0) {   // pre: cards the server already printed (same order) -> keep them
@@ -139,7 +140,8 @@ function catalogue(DB) {
     const HOTIMG = {shakebox: 'assets/img/gen/hot-brookie.webp', fruits: 'assets/img/gen/hot-fruits.webp'};
     const vid = (k, n, sub) => `<button type="button" class="card hotvid" data-v="${k}" data-n="${esc(n)}" data-img="${HOTIMG[k]}"><div class="ph"><span class="hotbadge">Hot</span><img src="${HOTIMG[k]}" onerror="this.onerror=null;this.src='assets/vid/${k}.jpg'" alt="${esc(n)}" loading="lazy"><span class="playhint" aria-hidden="true">▶</span></div><div class="cap">${esc(n)}<small>${esc(sub)}</small></div></button>`;
     const prods = hh.dataset.ids.split(',').map(i => byId[+i]).filter(Boolean).map(p => card(p).replace('<div class="ph">', '<div class="ph"><span class="hotbadge">Hot</span>'));
-    hh.innerHTML = [vid('shakebox', 'Brookie', 'Το viral μας'), prods[0], vid('fruits', 'Viral fruits', 'Κάθε Τετάρτη νέες γεύσεις'), ...prods.slice(1)].filter(Boolean).join('');
+    const hotP = id => byId[id] && card(byId[id]).replace('<div class="ph">', '<div class="ph"><span class="hotbadge">Hot</span>');
+    hh.innerHTML = [hotP(910901) || vid('shakebox', 'Brookie', 'Το viral μας'), prods[0], hotP(910902) || vid('fruits', 'Viral fruits', 'Κάθε Τετάρτη νέες γεύσεις'), ...prods.slice(1)].filter(Boolean).join('');
     watch(hh);
   }
   if (page === 'catalogue') {
@@ -199,19 +201,40 @@ function catalogue(DB) {
     addEventListener('hashchange', () => { navK = null; draw(); window.scrollTo(0, 0); }); draw();
   }
   if (page === 'product') {
+    let pFirst = true;
+    const galHTML = vs => `<div class="gal"><div class="gtrack"><figure class="gslide"><button type="button" class="gbadge" aria-label="Δείτε τα βίντεο">▶ ${vs.length} βίντεο</button></figure>${vs.map(k => { const r = REELS[k];
+        return `<figure class="gslide gvid" data-v="${k}"><img src="${VIDP}${k}.jpg" alt="${esc(r.t)}" loading="lazy"><button type="button" class="gplay" aria-label="Αναπαραγωγή: ${esc(r.t)}"><span aria-hidden="true">▶</span> Βίντεο</button>
+        <figcaption class="gsoc"><span>${esc(r.t)}</span>${r.ig ? `<a href="${igUrl(r)}" target="_blank" rel="noopener" aria-label="Δείτε το στο Instagram">${ICON.ig}</a>` : ''}${r.tt ? `<a href="${ttUrl(r)}" target="_blank" rel="noopener" aria-label="Δείτε το στο TikTok">${ICON.tt}</a>` : ''}</figcaption></figure>`; }).join('')}</div>
+      <button type="button" class="garr gprev" aria-label="Προηγούμενο">←</button><button type="button" class="garr gnext" aria-label="Επόμενο">→</button>
+      <div class="gdots">${[0, ...vs].map((_, i) => `<button type="button" aria-label="${i ? 'Βίντεο ' + i : 'Φωτογραφία'}"${i ? '' : ' aria-current="true"'}></button>`).join('')}</div></div>`;
+    const go = (g, i) => { const tr = $('.gtrack', g); tr.scrollTo({left: i * tr.clientWidth, behavior: reduce ? 'auto' : 'smooth'}); };
+    document.addEventListener('click', e => { const g = e.target.closest('.gal'); if (!g) return; const tr = $('.gtrack', g), at = Math.round(tr.scrollLeft / tr.clientWidth);
+      if (e.target.closest('.gprev')) return go(g, Math.max(0, at - 1));
+      if (e.target.closest('.gnext')) return go(g, Math.min(tr.children.length - 1, at + 1));
+      if (e.target.closest('.gbadge')) return go(g, 1);
+      const d = e.target.closest('.gdots button'); if (d) return go(g, [...d.parentNode.children].indexOf(d));
+      const pl = e.target.closest('.gplay'); if (pl) { const f = pl.closest('.gvid'), k = f.dataset.v, v = document.createElement('video');
+        Object.assign(v, {src: `${VIDP}${k}.mp4`, poster: `${VIDP}${k}.jpg`, controls: true, playsInline: true, autoplay: true}); $('img', f).replaceWith(v); pl.remove(); v.play().catch(() => {}); } });
+    document.addEventListener('scroll', e => { const tr = e.target; if (!(tr instanceof Element) || !tr.classList.contains('gtrack')) return;
+      const i = Math.round(tr.scrollLeft / tr.clientWidth); $$('.gdots button', tr.parentNode).forEach((b, j) => b.toggleAttribute('aria-current', j === i));
+      [...tr.children].forEach((sl, j) => { if (j !== i) $$('video', sl).forEach(v => v.pause()); }); }, true);
     const draw = () => {
       const id = +(location.hash.match(/^#p(\d+)$/) || [])[1]; const p = byId[id] || P[0];
       const c0 = p.c.find(k => cats[k] && k !== 'proionta') || p.c[0]; const c = cats[c0];
       document.title = `${p.n} · MARON Patisserie Gelateria`;
       $('#pName').textContent = p.n; $('#pName').nextElementSibling?.classList.contains('pcode') && $('#pName').nextElementSibling.remove();
-      if (p.code) $('#pName').insertAdjacentHTML('afterend', `<p class="pcode">Κωδ. ${esc(p.code)}</p>`); $('#pMedia').innerHTML = `<div class="atl" role="img" aria-label="${esc(p.alt || p.n)}" style="${atl(p.t)}"></div>`;
+      if (p.code) $('#pName').insertAdjacentHTML('afterend', `<p class="pcode">Κωδ. ${esc(p.code)}</p>`); const ssr = pFirst; pFirst = false; const m = $('#pMedia');
+      if (!(ssr && m.dataset.ssr)) m.innerHTML = `<div class="atl" role="img" aria-label="${esc(p.alt || p.n)}" style="${atl(p.t)}"></div>`;
+      const vs = (p.v || []).filter(k => REELS[k]);
+      if (vs.length) { const ph = m.firstElementChild; m.innerHTML = galHTML(vs); ph && $('.gslide', m).prepend(ph); }   // the photo node itself moves: no reload, no flash
       $('#pCat').textContent = label(c0) || 'Προϊόντα';
       $('#pDesc').innerHTML = p.d ? p.d.split(/\n+/).filter(Boolean).map(x => x.startsWith('<em>') ? `<p class="tagline">${x}</p>` : x.startsWith('<') ? x : `<p>${x}</p>`).join('') : `<p>Ρωτήστε μας για γεύσεις, μεγέθη και διαθεσιμότητα.</p>`;
       $('#pFacts').innerHTML = `<dt>Κατηγορία</dt><dd>${p.c.filter(k => cats[k] && k !== 'proionta').map(k => `<a href="katigoria.html#${k}">${esc(label(k))}</a>`).join(', ')}</dd><dt>Παραγγελία</dt><dd>Με μήνυμα στο Instagram ή στο τηλέφωνο</dd>`;
       $('#crumbs').innerHTML = `<a href="index.html">Αρχική</a> <span aria-hidden="true">/</span> <a href="proionta.html">Προϊόντα</a> <span aria-hidden="true">/</span> ${c && c.parentKey && c.parentKey !== 'proionta' ? `<a href="katigoria.html#${c.parentKey}">${esc(label(c.parentKey))}</a> <span aria-hidden="true">/</span> ` : ''}<a href="katigoria.html#${c0}">${esc(label(c0))}</a>`;
       const sibs = inCat(c0); const i = sibs.findIndex(x => x.id === p.id); const prev = sibs[(i - 1 + sibs.length) % sibs.length], next = sibs[(i + 1) % sibs.length];
       $('#pNav').innerHTML = `<a href="proion.html#p${prev.id}">← ${esc(prev.n)}</a><a href="proion.html#p${next.id}" style="text-align:right">${esc(next.n)} →</a>`;
-      const rel = sibs.filter(x => x.id !== p.id); const start = Math.max(0, i); $('#related').innerHTML = rel.slice(start, start + 8).concat(rel.slice(0, Math.max(0, 8 - rel.slice(start).length))).slice(0, 8).map(card).join('');
+      const rel = sibs.filter(x => x.id !== p.id); const start = Math.max(0, i);
+      if (!(ssr && $('#related').dataset.ssr)) $('#related').innerHTML = rel.slice(start, start + 8).concat(rel.slice(0, Math.max(0, 8 - rel.slice(start).length))).slice(0, 8).map(card).join('');
       $('#relMore').href = `katigoria.html#${c0}`; $('#relMore').textContent = `Όλες οι ${label(c0)} (${sibs.length}) →`;
       $('#pOld').textContent = p.old; const ow = $('#pOldWrap'); if (ow) ow.hidden = !p.old;
       const of = $('#orderForm'); if (of) { const isCake = p.c.some(k => anc(k).includes('tourtes')); of.hidden = !isCake; $('#ofProduct').value = p.code ? `${p.n} · ${p.code}` : p.n; of.open = false; }

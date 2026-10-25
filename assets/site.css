@@ -980,3 +980,26 @@ nav.main a.ml{letter-spacing:.2em;font-size:11px}
 /* category page: one row per sub-category (Τούρτες, Γλυκά …) */
 .catgroups{margin-top:clamp(18px,2.5vw,34px)}
 .catgroups .shelfrow:last-child{margin-bottom:0}
+
+/* product cards with videos + product page photo/video slider (2026-10-25) */
+.vbadge{position:absolute;right:10px;top:10px;z-index:2;background:rgba(15,10,8,.72);color:#FBF3EA;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;padding:5px 9px;backdrop-filter:blur(4px)}
+.gal{position:relative;width:100%;height:100%}
+.gtrack{display:flex;width:100%;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.gtrack::-webkit-scrollbar{display:none}
+.gslide{flex:0 0 100%;height:100%;margin:0;scroll-snap-align:start;position:relative;background:var(--filmbg)}
+.gslide>img,.gslide>video,.gslide>.atl{width:100%;height:100%;object-fit:cover;display:block}
+.gvid>video{object-fit:contain}
+.gbadge{position:absolute;left:14px;top:14px;border:0;background:rgba(15,10,8,.72);color:#FBF3EA;font:inherit;font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding:9px 13px;cursor:pointer;backdrop-filter:blur(4px)}
+.gplay{position:absolute;left:50%;top:50%;translate:-50% -50%;border:0;border-radius:999px;background:rgba(15,10,8,.72);color:#FBF3EA;font:inherit;font-size:12px;letter-spacing:.2em;text-transform:uppercase;padding:14px 22px;cursor:pointer;backdrop-filter:blur(6px)}
+.gplay span{margin-right:6px}
+.gsoc{position:absolute;left:14px;right:14px;bottom:44px;display:flex;align-items:center;gap:8px;pointer-events:none}
+.gsoc span{flex:1;color:#FBF3EA;font-size:13px;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.gsoc a{pointer-events:auto;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(15,10,8,.72);color:#FBF3EA}
+.gsoc svg{width:18px;height:18px}
+.garr{position:absolute;top:50%;translate:0 -50%;width:42px;height:42px;border-radius:50%;border:0;background:rgba(15,10,8,.55);color:#FBF3EA;cursor:pointer;font-size:16px}
+.gprev{left:12px}.gnext{right:12px}
+.gdots{position:absolute;left:0;right:0;bottom:16px;display:flex;justify-content:center;gap:7px}
+.gdots button{width:7px;height:7px;border-radius:4px;border:0;padding:0;background:rgba(251,243,234,.55);cursor:pointer;transition:width .3s}
+.gdots button[aria-current]{background:#FBF3EA;width:20px}
+.gvid:has(video) .gsoc{bottom:64px}
+@media (hover:none){.garr{display:none}}
