@@ -1003,3 +1003,8 @@ nav.main a.ml{letter-spacing:.2em;font-size:11px}
 .gdots button[aria-current]{background:#FBF3EA;width:20px}
 .gvid:has(video) .gsoc{bottom:64px}
 @media (hover:none){.garr{display:none}}
+/* contrast / heading order (Lighthouse 2026-10-26) */
+.catgroups .shelfhead h2{margin:0;font-weight:500;font-size:20px;letter-spacing:-.01em}
+.catgroups .shelfhead h2 small{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px;font-variant-numeric:tabular-nums}
+.chip[aria-current="page"] small,.chip[aria-pressed="true"] small{opacity:.85}
+.hotbadge{background:#A9512F}

@@ -165,7 +165,7 @@ function catalogue(DB) {
     let navK = null, first = true;
     const groupsHTML = (k, list) => {
       const ks = (window.CAT_GROUPS && CAT_GROUPS[k]) || []; const seen = new Set();
-      const row = (key, name, l) => `<div class="shelfrow"><div class="shelfhead"><h3>${esc(name)} <small>${l.length}</small></h3>${key ? `<a class="textlink" data-k="${key}" href="katigoria.html#${key}">Δείτε όλες →</a>` : ''}</div><div class="shelf">${l.slice(0, 12).map(card).join('')}</div></div>`;
+      const row = (key, name, l) => `<div class="shelfrow"><div class="shelfhead"><h2>${esc(name)} <small>${l.length}</small></h2>${key ? `<a class="textlink" data-k="${key}" href="katigoria.html#${key}">Δείτε όλες →</a>` : ''}</div><div class="shelf">${l.slice(0, 12).map(card).join('')}</div></div>`;
       const out = ks.map(g => { const l = inCat(g); l.forEach(p => seen.add(p.id)); return l.length ? row(g, label(g), l) : ''; });
       const rest = list.filter(p => !seen.has(p.id)); if (rest.length) out.push(row('', 'Περισσότερες', rest));
       return out.join('');
