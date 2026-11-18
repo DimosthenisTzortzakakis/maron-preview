@@ -1027,3 +1027,12 @@ nav.main a.ml{letter-spacing:.2em;font-size:11px}
 .ltdband.teaser::after{display:none}
 .ltdq{position:absolute;right:clamp(16px,9vw,160px);top:50%;transform:translateY(-50%);font-family:var(--serif,Georgia,serif);font-size:clamp(180px,26vw,420px);line-height:1;color:rgba(233,201,160,.16);pointer-events:none}
 @media (max-width:760px){.ltdq{font-size:200px;right:8px;top:auto;bottom:-30px;transform:none}.ltdband.teaser .ltdin{padding-block:44px}}
+/* limited band: everything centred (client 2026-11-19) */
+.ltdband{justify-content:center;text-align:center}
+.ltdin{display:flex;flex-direction:column;align-items:center}
+.ltdin p{margin-inline:auto}
+.ltdband picture img{object-position:center}
+.ltdband::after{background:radial-gradient(70% 90% at 50% 50%,rgba(40,24,16,.72) 0%,rgba(40,24,16,.45) 60%,rgba(40,24,16,.25) 100%)}
+.ltdband.teaser{background:radial-gradient(90% 120% at 50% 50%,#6B3F27 0%,#3A2418 50%,#24150E 100%)}
+.ltdq{left:50%;right:auto;top:50%;bottom:auto;transform:translate(-50%,-50%);font-size:clamp(260px,34vw,520px);color:rgba(233,201,160,.2)}
+@media (max-width:760px){.ltdq{font-size:300px;left:50%;right:auto;top:50%;bottom:auto;transform:translate(-50%,-50%)}}
